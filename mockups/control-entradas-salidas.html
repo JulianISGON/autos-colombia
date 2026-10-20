@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Autos Colombia - Control Operativo</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;700;800;900&amp;family=Space+Grotesk:wght@600;700&amp;family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* CSS TOKENS & DESIGN SYSTEM */
+    :root {
+      --bg-surface: #0b1326;
+      --bg-surface-lowest: #060e20;
+      --bg-surface-low: #131b2e;
+      --bg-surface-container: #171f33;
+      --bg-surface-high: #222a3d;
+      --bg-surface-highest: #2d3449;
+      --bg-surface-bright: #31394d;
+      
+      --color-primary: #4edea3;
+      --color-primary-container: #10b981;
+      --color-on-primary: #003824;
+      --color-on-primary-container: #00422b;
+      --color-primary-fixed: #6ffbbe;
+      
+      --color-secondary: #ffb95f;
+      --color-secondary-container: #ee9800;
+      --color-secondary-fixed: #ffddb8;
+      --color-on-secondary: #472a00;
+      
+      --color-tertiary: #4cd7f6;
+      --color-tertiary-container: #00b2d0;
+      --color-on-tertiary: #003640;
+      
+      --color-error: #ffb4ab;
+      --color-error-container: #93000a;
+      --color-on-error: #690005;
+      
+      --color-on-surface: #dae2fd;
+      --color-on-surface-variant: #bbcabf;
+      --color-outline: #86948a;
+      --color-outline-variant: #3c4a42;
+      
+      --colombia-yellow: #fcd34d;
+      
+      --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+      --font-headline: 'Space Grotesk', system-ui, sans-serif;
+      
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --radius-xl: 12px;
+      --radius-pill: 9999px;
+      
+      --sidebar-width: 288px;
+      --header-height: 64px;
+    }
+
+    /* BASE RESET */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-surface);
+      color: var(--color-on-surface);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.45;
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      color: inherit;
+    }
+
+    input {
+      border: none;
+      outline: none;
+      background: none;
+      color: inherit;
+      font-family: inherit;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* MATERIAL SYMBOLS HELPER */
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+
+    /* COLOMBIAN LICENSE PLATES NATIVE COMPONENT */
+    .colombia-plate {
+      background-color: var(--colombia-yellow);
+      color: #000000;
+      border: 2px solid #000000;
+      border-radius: 4px;
+      padding: 3px 14px;
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+    .colombia-plate-country {
+      font-family: var(--font-code);
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: 0.15em;
+      color: rgba(0, 0, 0, 0.7);
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .colombia-plate-number {
+      font-family: var(--font-code);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      color: #000000;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    .colombia-plate-city {
+      font-family: var(--font-code);
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #000000;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .colombia-plate-mini {
+      padding: 2px 8px;
+      border-width: 1.5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .colombia-plate-mini .colombia-plate-number {
+      font-size: 14px;
+      letter-spacing: 0.08em;
+    }
+    .colombia-plate-mini .colombia-plate-city {
+      font-size: 7px;
+    }
+    .colombia-plate-white {
+      background-color: #f8fafc;
+      border-color: #000000;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background-color: var(--bg-surface-low);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.3);
+    }
+    .sidebar-brand {
+      height: var(--header-height);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--bg-surface-lowest);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .sidebar-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+    .brand-title {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      line-height: 1.1;
+    }
+    .brand-subtitle {
+      font-family: var(--font-code);
+      font-size: 10px;
+      color: var(--color-outline);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .server-status-box {
+      margin: 14px 16px 8px 16px;
+      background-color: var(--bg-surface-container);
+      padding: 8px 12px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      box-shadow: 0 0 8px var(--color-primary);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.9); }
+    }
+    .status-text {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-on-surface-variant);
+    }
+    .status-badge {
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 12px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      color: var(--color-on-surface-variant);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      background-color: var(--bg-surface-high);
+      color: var(--color-on-surface);
+    }
+    .nav-item.active {
+      background-color: rgba(78, 222, 163, 0.12);
+      color: var(--color-primary);
+      font-weight: 600;
+      border: 1px solid rgba(78, 222, 163, 0.25);
+    }
+    .sidebar-footer {
+      padding: 16px;
+      background-color: var(--bg-surface-lowest);
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .arm-status-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--color-outline);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .lpr-status-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--bg-surface-container);
+      padding: 8px 10px;
+      border-radius: var(--radius-lg);
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+    }
+
+    /* HEADER */
+    .top-header {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      height: var(--header-height);
+      z-index: 40;
+      background-color: rgba(11, 19, 38, 0.88);
+      backdrop-filter: blur(16px);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .header-stat-chip {
+      background-color: var(--bg-surface-container);
+      padding: 6px 14px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .occupancy-bar {
+      width: 60px;
+      height: 6px;
+      background-color: var(--bg-surface-highest);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+    .occupancy-fill {
+      width: 71%;
+      height: 100%;
+      background-color: var(--color-secondary);
+      border-radius: var(--radius-pill);
+    }
+    .alert-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-error-container);
+      color: var(--color-error);
+      padding: 8px 14px;
+      border-radius: var(--radius-lg);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      transition: background 0.2s;
+    }
+    .alert-btn:hover {
+      background-color: #ba1a1a;
+      color: #fff;
+    }
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--bg-surface-low);
+      padding: 4px 8px 4px 12px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+
+    /* MAIN CONTENT */
+    .main-wrapper {
+      margin-left: var(--sidebar-width);
+      padding-top: var(--header-height);
+      min-height: 100vh;
+      background-color: var(--bg-surface);
+    }
+    .content-container {
+      padding: 20px 24px 40px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* KPI METRICS GRID */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1280px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+    .kpi-card {
+      background-color: var(--bg-surface-low);
+      padding: 18px 20px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      transition: background-color 0.2s, transform 0.2s;
+    }
+    .kpi-card:hover {
+      background-color: var(--bg-surface-container);
+    }
+    .kpi-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--color-outline);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .kpi-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .kpi-number {
+      font-family: var(--font-headline);
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .kpi-tag {
+      font-family: var(--font-code);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-surface-container);
+      text-transform: uppercase;
+    }
+    .kpi-footer-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--color-on-surface-variant);
+    }
+    .kpi-line-accent {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    /* OPERATIONAL DUAL TERMINAL SECTION */
+    .terminal-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+    @media (max-width: 1100px) {
+      .terminal-section { grid-template-columns: 1fr; }
+    }
+    .terminal-panel {
+      background-color: var(--bg-surface-low);
+      border-radius: var(--radius-xl);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .terminal-header {
+      background-color: var(--bg-surface-lowest);
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+    }
+    .terminal-badge-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-headline);
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .terminal-badge-g1 {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+    .terminal-badge-g2 {
+      background-color: var(--color-secondary);
+      color: var(--color-on-secondary);
+    }
+    .terminal-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .terminal-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lane-tag {
+      font-family: var(--font-code);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* LPR VISUALIZER */
+    .lpr-camera-box {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background-color: var(--bg-surface-lowest);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .lpr-feed-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.65;
+      filter: contrast(1.2) brightness(0.9);
+    }
+    .lpr-overlay-gradient {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, var(--bg-surface-lowest) 0%, transparent 60%);
+    }
+    .lpr-telemetry-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(6, 14, 32, 0.85);
+      backdrop-filter: blur(4px);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-code);
+      font-size: 10px;
+      color: var(--color-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lpr-accuracy-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-code);
+      font-size: 10px;
+      font-weight: 700;
+    }
+    .lpr-center-target {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* VEHICLE CATEGORY BUTTONS */
+    .vehicle-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+    .vehicle-btn {
+      background-color: var(--bg-surface-container);
+      color: var(--color-on-surface);
+      padding: 10px 4px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      border: 1px solid transparent;
+    }
+    .vehicle-btn:hover {
+      background-color: var(--bg-surface-high);
+    }
+    .vehicle-btn.active {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(78, 222, 163, 0.3);
+    }
+
+    /* INPUTS & SELECTORS */
+    .field-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-on-surface-variant);
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+    .plate-input-container {
+      position: relative;
+      width: 100%;
+    }
+    .plate-input-field {
+      width: 100%;
+      background-color: var(--bg-surface-lowest);
+      color: var(--color-on-surface);
+      font-family: var(--font-code);
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 12px 42px 12px 14px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .plate-input-field:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px rgba(78, 222, 163, 0.25), inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .plate-search-field {
+      padding-left: 44px;
+      padding-right: 90px;
+      font-size: 16px;
+    }
+    .plate-search-field:focus {
+      border-color: var(--color-secondary);
+      box-shadow: 0 0 0 2px rgba(255, 185, 95, 0.25), inset 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .cell-suggest-card {
+      background-color: var(--bg-surface-high);
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .cell-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+      font-family: var(--font-headline);
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* RIGHT PANEL CARDS */
+    .exit-summary-card {
+      background-color: var(--bg-surface-lowest);
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .vehicle-found-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: rgba(23, 31, 51, 0.5);
+      padding: 12px 14px;
+      border-radius: var(--radius-lg);
+    }
+    .matrix-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+    }
+    .matrix-box {
+      background-color: var(--bg-surface-low);
+      padding: 10px 6px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .discount-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--bg-surface-high);
+      padding: 10px 14px;
+      border-radius: var(--radius-lg);
+    }
+    .payment-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .pay-btn {
+      background-color: var(--bg-surface-container);
+      color: var(--color-on-surface);
+      padding: 10px 6px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .pay-btn:hover {
+      background-color: var(--bg-surface-high);
+    }
+    .pay-btn.active {
+      background-color: var(--color-secondary);
+      color: var(--color-on-secondary);
+      box-shadow: 0 2px 10px rgba(255, 185, 95, 0.35);
+    }
+
+    /* BIG PRIMARY ACTION BUTTONS */
+    .action-btn-main {
+      width: 100%;
+      padding: 16px 20px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-headline);
+      font-size: 16px;
+      font-weight: 700;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      transition: transform 0.1s ease, filter 0.2s ease;
+    }
+    .action-btn-main:active {
+      transform: scale(0.99);
+    }
+    .btn-green-main {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+    .btn-green-main:hover {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+    }
+    .btn-orange-main {
+      background-color: var(--color-secondary);
+      color: var(--color-on-secondary);
+    }
+    .btn-orange-main:hover {
+      background-color: var(--color-secondary-fixed);
+    }
+    .shortcut-pill {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-code);
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* REALTIME LOGS TABLE */
+    .table-section {
+      background-color: var(--bg-surface-low);
+      border-radius: var(--radius-xl);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .table-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .filter-pills-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      background-color: var(--bg-surface-container);
+      color: var(--color-on-surface-variant);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 11px;
+      font-weight: 600;
+      transition: background 0.15s, color 0.15s;
+    }
+    .filter-chip:hover {
+      background-color: var(--bg-surface-high);
+      color: var(--color-on-surface);
+    }
+    .filter-chip.active {
+      background-color: var(--bg-surface-high);
+      color: var(--color-primary);
+      border: 1px solid rgba(78, 222, 163, 0.3);
+    }
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+    .realtime-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .realtime-table th {
+      background-color: var(--bg-surface-lowest);
+      color: var(--color-outline);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 12px 14px;
+    }
+    .realtime-table td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      white-space: nowrap;
+      font-size: 13px;
+    }
+    .realtime-table tr:hover td {
+      background-color: var(--bg-surface-container);
+    }
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      font-family: var(--font-code);
+      font-size: 11px;
+      color: var(--color-outline);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* TYPOGRAPHY UTILITIES */
+    .font-code { font-family: var(--font-code); }
+    .font-headline { font-family: var(--font-headline); }
+    .text-primary { color: var(--color-primary); }
+    .text-secondary { color: var(--color-secondary); }
+    .text-tertiary { color: var(--color-tertiary); }
+    .text-outline { color: var(--color-outline); }
+    .text-variant { color: var(--color-on-surface-variant); }
+  </style>
+</head>
+<body>
+<!-- ASIDE / NAVIGATION DRAWER -->
+<aside class="sidebar">
+<div>
+<div class="sidebar-brand">
+<img alt="Autos Colombia Logo" class="sidebar-logo" src="https://lh3.googleusercontent.com/aida/AEtjO1WsHH8JpVRtco0x5cAFaIviMWuwHyQ4kyqt5X1YaehEs3DqCZAlwfugKzwAjZhxETjbxzVEVpxrStxYEYpERuIA5bhcG-8uJ6Dn7NTQaxAVlyox0pUR4G1Ffb9PtAIE08MGZe5YHeXGjDfW17sMHU8H15ZfxrO7nOI8vAoFoMFw0dPVOxrnMby8OETLSf-ZVuwKHmS016MjGYbiOwoGtIrJRtoHgjXZl_mYo5bvxUTa34ZQwxABRh1xNA"/>
+<div>
+<div class="brand-title">Autos Colombia</div>
+<div class="brand-subtitle">Control Operativo</div>
+</div>
+</div>
+<div class="server-status-box">
+<div class="status-indicator">
+<span class="pulse-dot"></span>
+<span class="status-text">Servidor Central</span>
+</div>
+<span class="status-badge">En Línea</span>
+</div>
+<nav class="sidebar-nav">
+<a class="nav-item active" href="#">
+<span class="material-symbols-outlined text-primary">sync_alt</span>
+<span>Control Entradas/Salidas</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span>Mapa de Celdas</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span>Caja y Pagos</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span>Novedades y Daños</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>Mensualidades</span>
+</a>
+</nav>
+</div>
+<div class="sidebar-footer">
+<div class="arm-status-row">
+<span>Barreras Vehiculares</span>
+<span class="font-code text-primary" style="font-weight: 700;">ARM-2 OK</span>
+</div>
+<div class="lpr-status-pill">
+<span class="material-symbols-outlined text-primary" style="font-size: 16px;">videocam</span>
+<span>LPR Cámara L1: Activa</span>
+</div>
+</div>
+</aside>
+<!-- TOP HEADER -->
+<header class="top-header">
+<div class="header-left">
+<div class="header-stat-chip">
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">schedule</span>
+<div style="display: flex; flex-direction: column; line-height: 1.1;">
+<span class="font-code text-primary" style="font-size: 13px; font-weight: 700;">14:28:42</span>
+<span class="font-code text-variant" style="font-size: 9px; text-transform: uppercase;">Bogotá (UTC-5)</span>
+</div>
+</div>
+<div class="header-stat-chip">
+<div style="display: flex; flex-direction: column;">
+<span class="font-code text-outline" style="font-size: 9px; text-transform: uppercase;">Ocupación Total</span>
+<span class="font-code" style="font-size: 14px; font-weight: 700;">142/200 <span class="text-secondary" style="font-size: 12px; font-weight: 400;">Celdas (71%)</span></span>
+</div>
+<div class="occupancy-bar">
+<div class="occupancy-fill"></div>
+</div>
+</div>
+<div class="header-stat-chip" style="background-color: var(--bg-surface-high);">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">payments</span>
+<div style="display: flex; flex-direction: column; line-height: 1.1;">
+<span class="text-variant" style="font-size: 10px; font-weight: 600; text-transform: uppercase;">Tarifa Fracción</span>
+<span class="font-code" style="font-size: 12px; font-weight: 700;">$110 COP / Min</span>
+</div>
+</div>
+</div>
+<div class="header-right">
+<button class="alert-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">e911_emergency</span>
+<span>Alerta Barricada</span>
+</button>
+<div class="user-profile-badge">
+<div style="text-align: right; line-height: 1.2;">
+<div style="font-weight: 600; font-size: 13px;">Juan Montalvo</div>
+<div class="text-primary font-code" style="font-size: 10px; text-transform: uppercase;">Operador Cabina 1</div>
+</div>
+<img alt="Juan Montalvo" class="user-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACx_nTeMJpqXQk-By8tG5_bOyLiK6N_8u5gJfYn2X8XV6EaJIMxkO9y8UzbcrCyaAef5JFYrZnZ7XggO0d_PzoHvhcG-nYOYI7YmENSjK-1TZ5fLDr5kYqod3uUs_YBgSHtKCCZsuQexw35ImZmXzdM7jpE6fNmtWAqtRXtSqnBsTJ-tHAuucWRWzXnwNO0HeRD0I1FQX-1It_0bJrudaYV8quA_yQc4nG8fHHu6jDx0U7I1emdLLn"/>
+</div>
+</div>
+</header>
+<!-- MAIN VIEWPORT -->
+<main class="main-wrapper">
+<div class="content-container">
+<!-- TOP TELEMETRY KPIS -->
+<section class="kpi-grid">
+<!-- KPI 1 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Entradas Hoy</span>
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">login</span>
+</div>
+<div class="kpi-value-row">
+<span class="kpi-number text-primary">328</span>
+<span class="kpi-tag text-primary">+14% vs ayer</span>
+</div>
+<div class="kpi-footer-note">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">sensors</span>
+<span>Paso continuo Carril 1 y 2</span>
+</div>
+<div class="kpi-line-accent" style="background: linear-gradient(90deg, var(--color-primary), transparent);"></div>
+</div>
+<!-- KPI 2 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Salidas Hoy</span>
+<span class="material-symbols-outlined text-secondary" style="font-size: 20px;">logout</span>
+</div>
+<div class="kpi-value-row">
+<span class="kpi-number">186</span>
+<span class="kpi-tag text-secondary">Fluido</span>
+</div>
+<div class="kpi-footer-note">
+<span class="material-symbols-outlined text-outline" style="font-size: 15px;">timer</span>
+<span>Tiempo medio atención: 22s</span>
+</div>
+<div class="kpi-line-accent" style="background: linear-gradient(90deg, var(--color-secondary), transparent);"></div>
+</div>
+<!-- KPI 3 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Ocupación Garitas</span>
+<div style="display: flex; align-items: center; gap: 4px; color: var(--color-secondary);">
+<span class="pulse-dot" style="background-color: var(--color-secondary); box-shadow: 0 0 6px var(--color-secondary);"></span>
+<span class="font-code" style="font-weight: 700;">71%</span>
+</div>
+</div>
+<div class="kpi-value-row" style="margin-top: 6px;">
+<span class="font-headline" style="font-size: 24px; font-weight: 700;">142</span>
+<span class="text-outline font-headline" style="font-size: 15px;">/ 200 celdas</span>
+</div>
+<div class="occupancy-bar" style="width: 100%; margin-top: 6px;">
+<div class="occupancy-fill" style="width: 71%;"></div>
+</div>
+<div class="font-code text-variant" style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 6px;">
+<span>Carros: <strong class="text-primary">110</strong></span>
+<span>Motos: <strong class="text-secondary">24</strong></span>
+<span class="text-tertiary">EV: <strong>8</strong></span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Recaudo Turno Actual</span>
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">account_balance_wallet</span>
+</div>
+<div class="kpi-value-row">
+<span class="kpi-number text-primary" style="font-size: 30px;">$1,485,000</span>
+<span class="font-code text-variant" style="font-size: 11px;">COP</span>
+</div>
+<div class="font-code" style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 8px;">
+<span class="text-variant">Efectivo: $820K</span>
+<span class="text-tertiary">Digital/QR: $665K</span>
+</div>
+<div class="kpi-line-accent" style="background: linear-gradient(90deg, var(--color-tertiary), var(--color-primary), transparent);"></div>
+</div>
+</section>
+<!-- TACTICAL TERMINALS: INGRESO & SALIDA -->
+<section class="terminal-section">
+<!-- LEFT PANEL: GARITA 1 INGRESO -->
+<div class="terminal-panel">
+<div class="terminal-header">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div class="terminal-badge-icon terminal-badge-g1">G1</div>
+<div class="terminal-title-group">
+<div class="terminal-title-row">
+<span class="font-headline" style="font-size: 16px; font-weight: 700; text-transform: uppercase;">Ingreso y Detección</span>
+<span class="lane-tag text-primary" style="background-color: rgba(78, 222, 163, 0.15);">CARRIL NORTE</span>
+</div>
+<span class="font-code text-outline" style="font-size: 11px;">Talanquera Automática ARM-1 • Activa</span>
+</div>
+</div>
+<div class="status-indicator" style="background-color: var(--bg-surface-container); padding: 5px 10px; border-radius: var(--radius-md);">
+<span class="pulse-dot"></span>
+<span class="font-code text-primary" style="font-weight: 700; font-size: 11px;">LPR ONLINE</span>
+</div>
+</div>
+<!-- LPR Live View -->
+<div class="lpr-camera-box">
+<img alt="LPR Security Camera" class="lpr-feed-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0ygGKJKDvpOTncZ98ObKu_WVfEjEUn-1_OBTQbfOLl-J1LwGjPTsroay63FOVC4AHiUJB64LSpXJsJZkdCkGg9NjxPUM_o9rSWyUjv1QZO5ZCF7-7Kj1b2jxKnrHE9xcGiCF2zpJ0GaXJzG2rgsxFi11mxBYe93DfcHR13ImQJt0Q7OCMoB1crNNQXljbUY8rQ5KPNCodXuO4FHOKq-9ouXvnwTU9x3YY3u3BFRRb5tnRyQv2fDsF"/>
+<div class="lpr-overlay-gradient"></div>
+<div class="lpr-telemetry-tag">
+<span class="pulse-dot" style="width: 6px; height: 6px;"></span>
+<span>CAM-01 • 30 FPS • 1080p</span>
+</div>
+<div class="lpr-accuracy-tag">LPR: 99.4% Certeza</div>
+<div class="lpr-center-target">
+<div class="colombia-plate" id="anpr-preview-container" style="cursor: pointer; transform: scale(1.05);">
+<span class="colombia-plate-country">COLOMBIA</span>
+<span class="colombia-plate-number" id="anpr-preview-plate">QHY-582</span>
+<span class="colombia-plate-city">BOGOTA D.C.</span>
+</div>
+<div class="font-code text-tertiary" style="display: flex; align-items: center; gap: 4px; background: rgba(6, 14, 32, 0.85); padding: 2px 8px; border-radius: var(--radius-sm);">
+<span class="material-symbols-outlined" style="font-size: 14px;">verified</span>
+<span style="font-size: 11px;">Coincidencia automática de video</span>
+</div>
+</div>
+</div>
+<!-- Vehicle Category Selection -->
+<div>
+<div class="field-label">
+<span>Clasificación Vehicular</span>
+<span class="font-code text-outline">Teclas rápidas [1-5]</span>
+</div>
+<div class="vehicle-selector-grid" id="vehicle-type-selector">
+<button class="vehicle-btn active" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">directions_car</span>
+<span>Carro</span>
+</button>
+<button class="vehicle-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">two_wheeler</span>
+<span>Moto</span>
+</button>
+<button class="vehicle-btn" style="color: var(--color-tertiary);" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">electric_car</span>
+<span>Eléctrico</span>
+</button>
+<button class="vehicle-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">local_shipping</span>
+<span>Camión</span>
+</button>
+<button class="vehicle-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">pedal_bike</span>
+<span>Bici</span>
+</button>
+</div>
+</div>
+<!-- Inputs Dual Column -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+<div>
+<div class="field-label">
+<span>Placa a Registrar</span>
+<span class="text-primary font-code">Validada</span>
+</div>
+<div class="plate-input-container">
+<input class="plate-input-field" id="plate-input-g1" type="text" value="QHY-582"/>
+<button style="position: absolute; right: 12px; top: 14px; color: var(--color-outline);" title="Copiar Placa" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">content_copy</span>
+</button>
+</div>
+</div>
+<div>
+<div class="field-label">
+<span>Celda Inteligente Sugerida</span>
+</div>
+<div class="cell-suggest-card">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="cell-badge">A14</div>
+<div style="display: flex; flex-direction: column; line-height: 1.15;">
+<span style="font-weight: 600; font-size: 13px;">Piso 1 - Nivel A</span>
+<span class="text-outline" style="font-size: 11px;">Cerca a ascensor principal</span>
+</div>
+</div>
+<button class="text-tertiary" style="font-size: 11px; font-weight: 700; text-transform: uppercase;" type="button">Cambiar</button>
+</div>
+</div>
+</div>
+<!-- Modality and Checkbox -->
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: center;">
+<div style="background-color: var(--bg-surface-container); padding: 10px 14px; border-radius: var(--radius-lg); display: flex; align-items: center; gap: 14px;">
+<label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px;">
+<input checked="" name="entry-type" style="accent-color: var(--color-primary);" type="radio"/>
+<span>Visitante (Fracción)</span>
+</label>
+<label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 13px; color: var(--color-outline);">
+<input name="entry-type" style="accent-color: var(--color-primary);" type="radio"/>
+<span>Mensualidad</span>
+</label>
+</div>
+<label style="background-color: var(--bg-surface-container); padding: 8px 14px; border-radius: var(--radius-lg); display: flex; align-items: center; gap: 10px; cursor: pointer;">
+<input style="accent-color: var(--color-secondary); width: 16px; height: 16px;" type="checkbox"/>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span style="font-weight: 600; font-size: 11px; text-transform: uppercase; color: var(--color-on-surface);">¿Novedad o Daño Previo?</span>
+<span class="text-outline" style="font-size: 11px;">Rayón visible o golpe previo</span>
+</div>
+</label>
+</div>
+<!-- Submit Button Entry -->
+<button class="action-btn-main btn-green-main" id="btn-submit-entry" type="button">
+<div style="display: flex; align-items: center; gap: 14px;">
+<span class="material-symbols-outlined" style="font-size: 26px;">sensors</span>
+<div style="text-align: left; line-height: 1.2;">
+<div style="text-transform: uppercase; letter-spacing: 0.04em;">Registrar Ingreso y Abrir Talanquera</div>
+<div class="font-code" style="font-size: 11px; font-weight: 400; opacity: 0.9;">Emisión automática ticket QR digital + Físico</div>
+</div>
+</div>
+<div class="shortcut-pill">
+<span>[F2 INGRESO]</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</div>
+</button>
+</div>
+<!-- RIGHT PANEL: GARITA 2 SALIDA -->
+<div class="terminal-panel">
+<div class="terminal-header">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div class="terminal-badge-icon terminal-badge-g2">G2</div>
+<div class="terminal-title-group">
+<div class="terminal-title-row">
+<span class="font-headline" style="font-size: 16px; font-weight: 700; text-transform: uppercase;">Salida y Cobro Express</span>
+<span class="lane-tag text-secondary" style="background-color: rgba(255, 185, 95, 0.15);">CARRIL SUR</span>
+</div>
+<span class="font-code text-outline" style="font-size: 11px;">Talanquera Automática ARM-2 • Lista</span>
+</div>
+</div>
+<div class="font-code text-secondary" style="display: flex; align-items: center; gap: 6px; background-color: var(--bg-surface-container); padding: 5px 10px; border-radius: var(--radius-md);">
+<span class="material-symbols-outlined" style="font-size: 16px;">barcode_scanner</span>
+<span style="font-weight: 700; font-size: 11px;">LECTOR ACTIVO</span>
+</div>
+</div>
+<!-- Search Plate / Ticket -->
+<div>
+<div class="field-label">
+<span>Escanear Ticket o Digitar Placa Saliente</span>
+<span class="text-tertiary font-code">Búsqueda en caliente</span>
+</div>
+<div class="plate-input-container">
+<span class="material-symbols-outlined text-outline" style="position: absolute; left: 14px; top: 14px; font-size: 20px;">search</span>
+<input class="plate-input-field plate-search-field" id="plate-exit-search" placeholder="DIGITE PLACA O ESCANEE QR..." type="text" value="KLU-304"/>
+<button style="position: absolute; right: 8px; top: 8px; background-color: var(--bg-surface-high); padding: 6px 14px; border-radius: var(--radius-md); font-size: 11px; font-weight: 700; text-transform: uppercase;" type="button">Buscar</button>
+</div>
+</div>
+<!-- Vehicle Breakdown & Settlement Card -->
+<div class="exit-summary-card">
+<div class="vehicle-found-row">
+<div style="display: flex; align-items: center; gap: 12px;">
+<div class="colombia-plate colombia-plate-mini">
+<span class="colombia-plate-number">KLU-304</span>
+<span class="colombia-plate-city">MEDELLIN</span>
+</div>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span style="font-weight: 600; font-size: 13px;">Mazda CX-30 Rojo Velvet</span>
+<span class="font-code text-outline" style="font-size: 11px;">Ticket: #TK-88291 • Celda B-07</span>
+</div>
+</div>
+<span class="font-code text-primary" style="background-color: rgba(78, 222, 163, 0.15); padding: 3px 8px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 600;">Sin Multa</span>
+</div>
+<!-- Times matrix -->
+<div class="matrix-grid">
+<div class="matrix-box">
+<span class="text-outline" style="font-size: 10px; text-transform: uppercase; font-weight: 600;">Ingreso</span>
+<span class="font-code" style="font-weight: 700; font-size: 14px; margin-top: 2px;">08:15 AM</span>
+<span class="text-outline" style="font-size: 11px;">Hoy</span>
+</div>
+<div class="matrix-box">
+<span class="text-outline" style="font-size: 10px; text-transform: uppercase; font-weight: 600;">Salida</span>
+<span class="font-code" style="font-weight: 700; font-size: 14px; margin-top: 2px;">11:42 AM</span>
+<span class="text-outline" style="font-size: 11px;">En Garita 2</span>
+</div>
+<div class="matrix-box">
+<span class="text-secondary" style="font-size: 10px; text-transform: uppercase; font-weight: 700;">Permanencia</span>
+<span class="font-code text-secondary" style="font-weight: 700; font-size: 14px; margin-top: 2px;">3h 27min</span>
+<span class="text-outline" style="font-size: 11px;">207 Minutos</span>
+</div>
+</div>
+<!-- Agreement row -->
+<div class="discount-banner">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">storefront</span>
+<span style="font-size: 13px; font-weight: 500;">Convenio: Centro Comercial Andino</span>
+</div>
+<span class="font-code text-primary" style="background-color: rgba(78, 222, 163, 0.15); padding: 2px 6px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700;">-20% Dcto</span>
+</div>
+<!-- Price row -->
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 4px;">
+<div>
+<div class="text-outline" style="font-size: 10px; text-transform: uppercase; font-weight: 600;">Total Liquidado a Pagar</div>
+<div class="text-variant" style="font-size: 11px;">Tarifa $110/min - Convenio aplicado</div>
+</div>
+<div style="display: flex; align-items: baseline; gap: 6px;">
+<span class="font-headline text-secondary" style="font-size: 32px; font-weight: 900; letter-spacing: -0.02em;">$13,800</span>
+<span class="font-code text-outline" style="font-size: 12px; font-weight: 700;">COP</span>
+</div>
+</div>
+</div>
+<!-- Payment Methods -->
+<div>
+<div class="field-label">Método de Cobro Inmediato</div>
+<div class="payment-grid" id="payment-method-selector">
+<button class="pay-btn active" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">payments</span>
+<span>Efectivo</span>
+</button>
+<button class="pay-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">credit_card</span>
+<span>Datáfono</span>
+</button>
+<button class="pay-btn" style="color: var(--color-tertiary);" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">qr_code_2</span>
+<span>Nequi / Davi</span>
+</button>
+<button class="pay-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 20px;">account_balance</span>
+<span>QR Bancolombia</span>
+</button>
+</div>
+</div>
+<!-- Submit Exit Settlement -->
+<button class="action-btn-main btn-orange-main" id="btn-submit-exit" type="button">
+<div style="display: flex; align-items: center; gap: 14px;">
+<span class="material-symbols-outlined" style="font-size: 26px;">point_of_sale</span>
+<div style="text-align: left; line-height: 1.2;">
+<div style="text-transform: uppercase; letter-spacing: 0.04em;">Cobrar $13,800 y Dar Salida</div>
+<div class="font-code" style="font-size: 11px; font-weight: 400; opacity: 0.9;">Abre Talanquera G2 • Entrega Factura DIAN</div>
+</div>
+</div>
+<div class="shortcut-pill">
+<span>[F4 COBRO]</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+</div>
+</button>
+</div>
+</section>
+<!-- BOTTOM REALTIME TABLE -->
+<section class="table-section">
+<div class="table-topbar">
+<div style="display: flex; align-items: center; gap: 10px;">
+<span class="material-symbols-outlined text-primary" style="font-size: 22px;">swap_horiz</span>
+<span class="font-headline" style="font-size: 16px; font-weight: 700; text-transform: uppercase;">Movimientos en Tiempo Real</span>
+<span class="font-code text-variant" style="background-color: var(--bg-surface-high); font-size: 10px; padding: 2px 6px; border-radius: var(--radius-sm);">En Vivo</span>
+</div>
+<div class="filter-pills-group">
+<button class="filter-chip active" type="button">Todos (328)</button>
+<button class="filter-chip" type="button">Sólo Ingresos</button>
+<button class="filter-chip" type="button">Sólo Salidas</button>
+<button class="filter-chip" style="color: var(--color-tertiary);" type="button">Con Novedad</button>
+</div>
+</div>
+<div class="table-wrapper">
+<table class="realtime-table">
+<thead>
+<tr>
+<th>Hora / Registro</th>
+<th>Placa Oficial</th>
+<th>Tipo</th>
+<th>Carril</th>
+<th>Celda</th>
+<th>Estado</th>
+<th>Total / Tarifa</th>
+<th style="text-align: right;">Acciones Rápidas</th>
+</tr>
+</thead>
+<tbody>
+<!-- Row 1 -->
+<tr>
+<td>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span class="font-code text-primary" style="font-weight: 700; font-size: 13px;">14:26:12</span>
+<span class="font-code text-outline" style="font-size: 10px;">Hace 2 min</span>
+</div>
+</td>
+<td>
+<div class="colombia-plate colombia-plate-mini">
+<span class="colombia-plate-number">QHY-582</span>
+<span class="colombia-plate-city">BOGOTA D.C.</span>
+</div>
+</td>
+<td>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">directions_car</span>
+<span>Automóvil</span>
+</div>
+</td>
+<td>
+<span class="font-code text-primary" style="background-color: rgba(78, 222, 163, 0.1); padding: 3px 6px; border-radius: var(--radius-sm); font-weight: 700;">Garita 1 (In)</span>
+</td>
+<td>
+<span class="font-code" style="background-color: var(--bg-surface-container); padding: 4px 8px; border-radius: var(--radius-sm); font-weight: 700;">A-14</span>
+</td>
+<td>
+<span class="font-code text-primary" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+<span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--color-primary);"></span>
+                    Ingresó
+                  </span>
+</td>
+<td class="font-code text-outline">En curso ($110/min)</td>
+<td style="text-align: right;">
+<div style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-outline);">
+<button style="hover: color: var(--color-primary);" title="Imprimir Ticket" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">receipt_long</span></button>
+<button title="Ver captura LPR" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">photo_camera</span></button>
+<button title="Reportar Daño" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">report_problem</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr>
+<td>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span class="font-code" style="font-weight: 700; font-size: 13px;">14:24:50</span>
+<span class="font-code text-outline" style="font-size: 10px;">Hace 4 min</span>
+</div>
+</td>
+<td>
+<div class="colombia-plate colombia-plate-mini">
+<span class="colombia-plate-number">ZXT-901</span>
+<span class="colombia-plate-city">CHIA</span>
+</div>
+</td>
+<td>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span class="material-symbols-outlined text-outline" style="font-size: 18px;">directions_car</span>
+<span>Automóvil</span>
+</div>
+</td>
+<td>
+<span class="font-code text-secondary" style="background-color: rgba(255, 185, 95, 0.1); padding: 3px 6px; border-radius: var(--radius-sm); font-weight: 700;">Garita 2 (Out)</span>
+</td>
+<td>
+<span class="font-code text-outline" style="background-color: var(--bg-surface-container); padding: 4px 8px; border-radius: var(--radius-sm);">C-03 (Libre)</span>
+</td>
+<td>
+<span class="font-code text-secondary" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+<span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--color-secondary);"></span>
+                    Pagado / Salió
+                  </span>
+</td>
+<td class="font-code" style="font-weight: 700;">$18,400 COP</td>
+<td style="text-align: right;">
+<div style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-outline);">
+<button title="Imprimir Factura DIAN" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">receipt</span></button>
+<button title="Ver foto LPR salida" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">photo_camera</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr>
+<td>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span class="font-code" style="font-weight: 700; font-size: 13px;">14:18:05</span>
+<span class="font-code text-outline" style="font-size: 10px;">Hace 10 min</span>
+</div>
+</td>
+<td>
+<div class="colombia-plate colombia-plate-mini">
+<span class="colombia-plate-number">HJK-91D</span>
+<span class="colombia-plate-city">SOACHA</span>
+</div>
+</td>
+<td>
+<div style="display: flex; align-items: center; gap: 6px;">
+<span class="material-symbols-outlined text-secondary" style="font-size: 18px;">two_wheeler</span>
+<span>Motocicleta</span>
+</div>
+</td>
+<td>
+<span class="font-code text-primary" style="background-color: rgba(78, 222, 163, 0.1); padding: 3px 6px; border-radius: var(--radius-sm); font-weight: 700;">Garita 1 (In)</span>
+</td>
+<td>
+<span class="font-code" style="background-color: var(--bg-surface-container); padding: 4px 8px; border-radius: var(--radius-sm); font-weight: 700;">M-12</span>
+</td>
+<td>
+<span class="font-code text-primary" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+<span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--color-primary);"></span>
+                    Estacionado
+                  </span>
+</td>
+<td class="font-code text-outline">En curso ($65/min)</td>
+<td style="text-align: right;">
+<div style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-outline);">
+<button title="Imprimir Ticket" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">receipt_long</span></button>
+<button title="Ver captura LPR" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">photo_camera</span></button>
+<button title="Novedad casco" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">report_problem</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr>
+<td>
+<div style="display: flex; flex-direction: column; line-height: 1.2;">
+<span class="font-code text-tertiary" style="font-weight: 700; font-size: 13px;">14:02:44</span>
+<span class="font-code text-outline" style="font-size: 10px;">Hace 26 min</span>
+</div>
+</td>
+<td>
+<div class="colombia-plate colombia-plate-mini colombia-plate-white">
+<span class="colombia-plate-number">EVX-102</span>
+<span class="colombia-plate-city">ENVIGADO</span>
+</div>
+</td>
+<td>
+<div class="text-tertiary" style="display: flex; align-items: center; gap: 6px;">
+<span class="material-symbols-outlined" style="font-size: 18px;">electric_car</span>
+<span>EV + Carga</span>
+</div>
+</td>
+<td>
+<span class="font-code text-primary" style="background-color: rgba(78, 222, 163, 0.1); padding: 3px 6px; border-radius: var(--radius-sm); font-weight: 700;">Garita 1 (In)</span>
+</td>
+<td>
+<span class="font-code text-tertiary" style="background-color: rgba(76, 215, 246, 0.1); padding: 4px 8px; border-radius: var(--radius-sm); font-weight: 700;">EV-03 (7.2kW)</span>
+</td>
+<td>
+<span class="font-code text-tertiary" style="display: inline-flex; align-items: center; gap: 6px; font-weight: 600;">
+<span class="pulse-dot" style="width: 7px; height: 7px; background-color: var(--color-tertiary); box-shadow: 0 0 6px var(--color-tertiary);"></span>
+                    Cargando 48%
+                  </span>
+</td>
+<td class="font-code text-outline">Tarifa Mixta</td>
+<td style="text-align: right;">
+<div style="display: inline-flex; align-items: center; gap: 8px; color: var(--color-outline);">
+<button title="Telemetría Cargador" type="button"><span class="material-symbols-outlined text-tertiary" style="font-size: 18px;">bolt</span></button>
+<button title="Imprimir Ticket" type="button"><span class="material-symbols-outlined" style="font-size: 18px;">receipt_long</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-footer">
+<div>
+<span>Mostrando 4 de 514 registros de hoy</span>
+<span class="text-variant" style="margin-left: 8px;">• Actualización automática en 3s</span>
+</div>
+<div style="display: flex; gap: 14px;">
+<span>[F2] Nueva Entrada</span>
+<span>[F4] Cobro Rápido</span>
+<span>[F9] Apertura Manual Emergencia</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- MICRO-INTERACTIONS JAVASCRIPT -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Vehicle category selector logic
+      const vehicleBtns = document.querySelectorAll('#vehicle-type-selector .vehicle-btn');
+      vehicleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          vehicleBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // 2. Payment method selector logic
+      const payBtns = document.querySelectorAll('#payment-method-selector .pay-btn');
+      payBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          payBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+
+      // 3. Plate sync between input and holographic overlay
+      const plateInput = document.getElementById('plate-input-g1');
+      const platePreview = document.getElementById('anpr-preview-plate');
+      if (plateInput && platePreview) {
+        plateInput.addEventListener('input', (e) => {
+          const val = e.target.value.toUpperCase();
+          platePreview.innerText = val || '---·---';
+        });
+      }
+
+      // 4. Keyboard Shortcuts for rapid parking booth operations
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'F2') {
+          e.preventDefault();
+          alert('Talanquera Garita 1: ¡ABIERTA! Ticket QR generado.');
+        }
+        if (e.key === 'F4') {
+          e.preventDefault();
+          alert('Cobro exitoso: $13,800 COP. Talanquera Garita 2: ¡ABIERTA!');
+        }
+      });
+
+      // 5. Submit feedback
+      const entrySubmit = document.getElementById('btn-submit-entry');
+      if (entrySubmit) {
+        entrySubmit.addEventListener('click', () => {
+          alert('Talanquera Garita 1: ¡ABIERTA! Entrada registrada con éxito.');
+        });
+      }
+
+      const exitSubmit = document.getElementById('btn-submit-exit');
+      if (exitSubmit) {
+        exitSubmit.addEventListener('click', () => {
+          alert('Pago procesado correctamente por $13,800 COP. Salida autorizada.');
+        });
+      }
+    });
+  </script>
+</body></html>

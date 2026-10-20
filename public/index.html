@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Autos Colombia | Control Operativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Space+Grotesk:wght@600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div>
+      <div class="brand"><div class="brand-mark">A</div><div><strong>Autos Colombia</strong><small>Control Operativo</small></div></div>
+      <div class="server-pill"><span class="live-dot"></span><span>Servidor Central</span><b>En Línea</b></div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-view="control"><span class="material-symbols-outlined">sync_alt</span>Control Entradas/Salidas</button>
+        <button class="nav-item" data-view="mapa"><span class="material-symbols-outlined">grid_view</span>Mapa de Celdas</button>
+        <button class="nav-item" data-view="control"><span class="material-symbols-outlined">point_of_sale</span>Caja y Pagos</button>
+        <button class="nav-item" data-view="control"><span class="material-symbols-outlined">report_problem</span>Novedades y Daños</button>
+        <button class="nav-item" data-view="control"><span class="material-symbols-outlined">badge</span>Mensualidades</button>
+      </nav>
+    </div>
+    <div class="sidebar-footer"><span>BARRERAS VEHICULARES <b>ARM-2 OK</b></span><div><span class="material-symbols-outlined">videocam</span>LPR Cámara L1: Activa</div></div>
+  </aside>
+  <header class="topbar">
+    <div class="top-metrics"><div class="metric"><span class="material-symbols-outlined">schedule</span><span id="clock">--:--:--<small>Bogotá (UTC-5)</small></span></div><div class="metric"><span>OCUPACIÓN TOTAL<strong id="occupancy">0/5 <em>(0%)</em></strong></span><i class="progress"><b id="occupancyBar"></b></i></div><div class="metric"><span class="material-symbols-outlined amber">payments</span><span>TARIFA FRACCIÓN<strong>$110 COP / Min</strong></span></div></div>
+    <div class="operator"><button class="alert-button"><span class="material-symbols-outlined">e911_emergency</span>Alerta Barricada</button><span>Juan Montalvo<small>Operador Cabina 1</small></span><div class="avatar">JI</div></div>
+  </header>
+  <main class="main">
+    <section id="controlView" class="view active-view">
+      <div class="kpi-grid"><article class="kpi"><label>Entradas Hoy <span class="material-symbols-outlined green">login</span></label><strong id="entryCount">0</strong><small>↗ Paso continuo Carril 1 y 2</small></article><article class="kpi"><label>Salidas Hoy <span class="material-symbols-outlined amber">logout</span></label><strong id="exitCount">0</strong><small>◷ Operación en tiempo real</small></article><article class="kpi"><label>Ocupación Garitas <b class="amber" id="occupancyPercent">0%</b></label><strong id="occupiedCount">0 <small>/ 5 celdas</small></strong><i class="progress"><b id="kpiBar"></b></i><small>Disponibles: <b class="green" id="availableCount">5</b></small></article><article class="kpi"><label>Recaudo Turno Actual <span class="material-symbols-outlined green">account_balance_wallet</span></label><strong class="green">$0</strong><small>Gestión conectada a SQLite</small></article></div>
+      <div class="terminal-grid">
+        <section class="panel entry-panel"><header class="panel-header"><div class="terminal-badge green-bg">G1</div><div><h2>Ingreso y Detección <span class="tag green-tag">CARRIL NORTE</span></h2><small>Talanquera Automática ARM-1 · Activa</small></div><b class="online"><span class="live-dot"></span>LPR ONLINE</b></header><div class="camera"><div class="camera-label">CAM-01 · 30 FPS · 1080p</div><div class="plate plate-large"><small>COLOMBIA</small><strong id="entryPreview">ABC123</strong><small>BOGOTÁ D.C.</small></div><span class="camera-confidence">LPR: 99.4% Certeza</span></div><div class="field"><label>Placa a Registrar <b class="green">Validada</b></label><input id="entryPlate" class="plate-input" value="ABC123" maxlength="10" autocomplete="off"></div><label class="check-row"><input id="hasNovelty" type="checkbox"><span><b>¿Novedad o Daño Previo?</b><small>Registrar observación al ingresar</small></span></label><textarea id="noveltyText" class="novelty-input" placeholder="Describe el daño u observación (opcional)" hidden></textarea><button id="entryButton" class="action green-action"><span class="material-symbols-outlined">sensors</span><span>REGISTRAR INGRESO Y ABRIR TALANQUERA<small>Emisión automática de ticket</small></span><kbd>F2 →</kbd></button><p id="entryMessage" class="message" aria-live="polite"></p></section>
+        <section class="panel exit-panel"><header class="panel-header"><div class="terminal-badge amber-bg">G2</div><div><h2>Salida y Cobro Express <span class="tag amber-tag">CARRIL SUR</span></h2><small>Talanquera Automática ARM-2 · Lista</small></div><b class="amber"><span class="material-symbols-outlined">barcode_scanner</span> LECTOR ACTIVO</b></header><div class="field"><label>Digitar Placa Saliente <b class="cyan">Búsqueda en caliente</b></label><div class="search-box"><span class="material-symbols-outlined">search</span><input id="exitPlate" class="plate-input" placeholder="DIGITE PLACA..." autocomplete="off"><button id="searchExit">BUSCAR</button></div></div><div id="exitSummary" class="exit-summary empty-state"><span class="material-symbols-outlined">directions_car</span><p>Busca una placa presente para preparar la salida.</p></div><button id="exitButton" class="action amber-action" disabled><span class="material-symbols-outlined">point_of_sale</span><span>REGISTRAR SALIDA Y LIBERAR CELDA<small>Actualiza el estado del parqueadero</small></span><kbd>F4 ✓</kbd></button><p id="exitMessage" class="message" aria-live="polite"></p></section>
+      </div>
+      <section class="panel movement-panel"><header class="section-header"><h2><span class="material-symbols-outlined green">swap_horiz</span>Movimientos en Tiempo Real <span class="tag">EN VIVO</span></h2><button id="refreshButton" class="ghost-button"><span class="material-symbols-outlined">refresh</span>Actualizar</button></header><div class="table-wrap"><table><thead><tr><th>Hora / Registro</th><th>Placa Oficial</th><th>Celda</th><th>Estado</th><th>Novedades</th></tr></thead><tbody id="movementRows"></tbody></table></div></section>
+    </section>
+    <section id="mapView" class="view"><div class="page-heading"><div><small class="eyebrow">TELEMETRÍA DE BAHÍAS · LOTE 01 CALLE 72</small><h1>Mapa Esquemático de Celdas <span class="tag">Sincronización en vivo</span></h1></div><button id="mapRefresh" class="ghost-button"><span class="material-symbols-outlined">sensors</span>Escanear LPR / Ultrasonido</button></div><div class="map-toolbar"><div class="search-box"><span class="material-symbols-outlined">search</span><input id="cellSearch" placeholder="Buscar placa o celda..."></div><div class="filters"><button class="filter active" data-filter="all">Todas</button><button class="filter" data-filter="DISPONIBLE">Disponibles</button><button class="filter" data-filter="OCUPADA">Ocupadas</button></div></div><div class="map-layout"><div class="panel floorplan"><header class="section-header"><h2><span class="green-dot"></span>Bahía principal · Celdas A</h2><span id="mapStatus" class="tag">0/5 ocupadas</span></header><div id="cellGrid" class="cell-grid"></div></div><aside class="panel inspector"><header class="section-header"><h2><span class="material-symbols-outlined green">tune</span>Inspector Operativo</h2><span class="live-dot"></span></header><div id="inspectorContent" class="inspector-content"><span class="material-symbols-outlined big-icon">touch_app</span><h3>Selecciona una celda</h3><p>Consulta su estado y vehículo asociado.</p></div></aside></div></section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

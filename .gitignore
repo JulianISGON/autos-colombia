@@ -1,0 +1,7 @@
+node_modules/
+dist/
+autos-colombia.sqlite
+autos-colombia.sqlite-shm
+autos-colombia.sqlite-wal
+.env
+.vscode/

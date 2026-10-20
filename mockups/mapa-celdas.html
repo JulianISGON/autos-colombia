@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Autos Colombia - Mapa Esquemático de Celdas</title>
+<!-- Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* -------------------------------------------------------------
+       CSS Custom Properties / Design Tokens (:root)
+    -------------------------------------------------------------- */
+    :root {
+      /* Theme Palettes */
+      --color-background: #0b1326;
+      --color-surface: #0b1326;
+      --color-surface-dim: #0b1326;
+      --color-surface-bright: #31394d;
+      --color-surface-container-lowest: #060e20;
+      --color-surface-container-low: #131b2e;
+      --color-surface-container: #171f33;
+      --color-surface-container-high: #222a3d;
+      --color-surface-container-highest: #2d3449;
+      --color-on-surface: #dae2fd;
+      --color-on-surface-variant: #bbcabf;
+      --color-outline: #86948a;
+      --color-outline-variant: #3c4a42;
+
+      /* Brand Accents */
+      --color-primary: #4edea3;
+      --color-primary-container: #10b981;
+      --color-on-primary: #003824;
+      --color-on-primary-container: #00422b;
+      --color-primary-fixed: #6ffbbe;
+
+      /* Secondary / Vehicle warning / Amber */
+      --color-secondary: #ffb95f;
+      --color-secondary-container: #ee9800;
+      --color-on-secondary: #472a00;
+      --color-on-secondary-fixed: #2a1700;
+      --color-secondary-fixed: #ffddb8;
+
+      /* Tertiary / EV Cyan */
+      --color-tertiary: #4cd7f6;
+      --color-tertiary-container: #00b2d0;
+      --color-on-tertiary: #003640;
+
+      /* Error / Alerts */
+      --color-error: #ffb4ab;
+      --color-error-container: #93000a;
+      --color-on-error: #690005;
+      --color-on-error-container: #ffdad6;
+
+      /* Typography */
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-headline: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+
+      /* Transitions & Shadows */
+      --transition-default: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --card-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      --sidebar-width: 288px;
+      --header-height: 64px;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+    }
+
+    /* -------------------------------------------------------------
+       Reset & Base Styles
+    -------------------------------------------------------------- */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--color-surface);
+      color: var(--color-on-surface);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.45;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      overscroll-behavior: none;
+    }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+      color: inherit;
+      border: none;
+      background: none;
+      outline: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      vertical-align: middle;
+      line-height: 1;
+      user-select: none;
+    }
+
+    /* -------------------------------------------------------------
+       App Layout Structure
+    -------------------------------------------------------------- */
+    .app-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background-color: var(--color-surface-container-low);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .main-wrapper {
+      padding-left: var(--sidebar-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-header {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      height: var(--header-height);
+      background-color: rgba(11, 19, 38, 0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .main-content {
+      margin-top: var(--header-height);
+      padding: 24px;
+      flex: 1;
+    }
+
+    /* -------------------------------------------------------------
+       Sidebar Navigation & Elements
+    -------------------------------------------------------------- */
+    .sidebar-brand {
+      height: var(--header-height);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--color-surface-container-lowest);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .sidebar-brand img {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .brand-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-primary);
+    }
+
+    .brand-subtitle {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-outline);
+    }
+
+    .server-status-pill {
+      margin: 12px 16px;
+      background-color: var(--color-surface-container);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      display: inline-block;
+      box-shadow: 0 0 8px var(--color-primary);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 12px;
+      margin-top: 4px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      color: var(--color-on-surface-variant);
+      font-weight: 500;
+      transition: background-color var(--transition-default), color var(--transition-default);
+    }
+
+    .nav-item:hover {
+      background-color: var(--color-surface-container-high);
+      color: var(--color-on-surface);
+    }
+
+    .nav-item.active {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+      font-weight: 700;
+      font-family: var(--font-headline);
+    }
+
+    .nav-item.active .material-symbols-outlined {
+      color: var(--color-on-primary-container);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      background-color: var(--color-surface-container-lowest);
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .barreras-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-outline);
+    }
+
+    .camera-lpr-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--color-surface-container);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+    }
+
+    /* -------------------------------------------------------------
+       Header Metrics & Controls
+    -------------------------------------------------------------- */
+    .header-left, .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-stat-box {
+      background-color: var(--color-surface-container);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-clock {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .stat-subtext {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--color-on-surface-variant);
+    }
+
+    .stat-progress-bar {
+      width: 64px;
+      height: 6px;
+      background-color: var(--color-surface-container-highest);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .stat-progress-fill {
+      height: 100%;
+      background-color: var(--color-secondary);
+      border-radius: 999px;
+    }
+
+    .alert-gate-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--color-error-container);
+      color: var(--color-on-error-container);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background-color var(--transition-default);
+    }
+
+    .alert-gate-btn:hover {
+      background-color: #ba1a1a;
+      color: #fff;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--color-surface-container-low);
+      padding: 5px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .user-profile-badge img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      box-shadow: 0 0 0 2px var(--color-primary);
+    }
+
+    /* -------------------------------------------------------------
+       Section 1: Telemetry Banner & Controls
+    -------------------------------------------------------------- */
+    .page-header-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .breadcrumb-telemetry {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--color-primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .page-title {
+      font-family: var(--font-headline);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      display: inline-block;
+      margin-right: 12px;
+    }
+
+    .sync-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-on-surface-variant);
+      background-color: var(--color-surface-container-high);
+      padding: 4px 10px;
+      border-radius: 999px;
+      vertical-align: middle;
+    }
+
+    .action-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .control-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--color-surface-container);
+      color: var(--color-on-surface);
+      padding: 8px 14px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: background-color var(--transition-default);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .control-btn:hover {
+      background-color: var(--color-surface-container-high);
+    }
+
+    .control-btn.text-accent {
+      color: var(--color-primary);
+    }
+
+    /* -------------------------------------------------------------
+       Level Switcher Tabs
+    -------------------------------------------------------------- */
+    .levels-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      background-color: var(--color-surface-container-lowest);
+      padding: 6px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .level-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-on-surface-variant);
+      cursor: pointer;
+      transition: all var(--transition-default);
+    }
+
+    .level-tab:hover {
+      background-color: var(--color-surface-container);
+      color: var(--color-on-surface);
+    }
+
+    .level-tab.active {
+      background-color: var(--color-surface-container-high);
+      color: var(--color-primary);
+    }
+
+    .pill-counter {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      margin-left: 4px;
+    }
+
+    .level-tab.active .pill-counter {
+      background-color: rgba(78, 222, 163, 0.18);
+      color: var(--color-primary);
+    }
+
+    .level-tab:not(.active) .pill-counter {
+      background-color: var(--color-surface-container-highest);
+      color: var(--color-on-surface-variant);
+    }
+
+    /* -------------------------------------------------------------
+       Filter Bar, Search and Legend
+    -------------------------------------------------------------- */
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background-color: var(--color-surface-container-low);
+      padding: 12px 16px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .search-terminal {
+      position: relative;
+      min-width: 280px;
+      flex: 0 1 320px;
+    }
+
+    .search-terminal .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-outline);
+      font-size: 18px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--color-surface-container-lowest);
+      color: var(--color-on-surface);
+      padding: 8px 36px 8px 38px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background-color var(--transition-default), border-color var(--transition-default);
+    }
+
+    .search-input:focus {
+      background-color: var(--color-surface-container-high);
+      border-color: var(--color-primary);
+    }
+
+    .search-shortcut {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-outline);
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    .filter-pills-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background-color: var(--color-surface-container);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      color: var(--color-on-surface);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: all var(--transition-default);
+    }
+
+    .filter-chip:hover {
+      background-color: var(--color-surface-container-high);
+    }
+
+    .filter-chip.active {
+      background-color: var(--color-surface-container-highest);
+      color: #fff;
+    }
+
+    .filter-chip .chip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .filter-chip .chip-count {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      opacity: 0.75;
+    }
+
+    .legend-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--color-surface-container-lowest);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* -------------------------------------------------------------
+       Two-Column Operational Layout
+    -------------------------------------------------------------- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (min-width: 1200px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 360px;
+      }
+    }
+
+    @media (min-width: 1540px) {
+      .dashboard-grid {
+        grid-template-columns: 1fr 400px;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       Parking Bay Modules & Roadway
+    -------------------------------------------------------------- */
+    .floorplan-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .bay-module {
+      background-color: var(--color-surface-container-low);
+      padding: 16px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .bay-module-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bay-module-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .bay-status-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-outline);
+      text-transform: uppercase;
+    }
+
+    .cells-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+    }
+
+    @media (min-width: 1600px) {
+      .cells-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       Parking Cell Unit (Card)
+    -------------------------------------------------------------- */
+    .parking-cell {
+      cursor: pointer;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      background-color: var(--color-surface-container);
+      min-height: 146px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all var(--transition-default);
+      position: relative;
+      user-select: none;
+    }
+
+    .parking-cell:hover {
+      background-color: var(--color-surface-container-high);
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow);
+    }
+
+    .cell-top-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .cell-id {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .cell-center-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      margin: 4px 0;
+    }
+
+    .cell-bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-outline);
+    }
+
+    /* Cell Variants by State */
+    /* Disponible */
+    .parking-cell[data-status="disponible"] .cell-id {
+      color: var(--color-primary);
+    }
+
+    .parking-cell[data-status="disponible"] .cell-status-label {
+      color: var(--color-primary);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .cell-assign-btn {
+      width: 100%;
+      padding: 4px 0;
+      background-color: var(--color-surface-container-highest);
+      color: var(--color-on-surface);
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      transition: background-color var(--transition-default), color var(--transition-default);
+    }
+
+    .parking-cell:hover .cell-assign-btn {
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+
+    /* Ocupada */
+    .parking-cell[data-status="ocupada"] .cell-id {
+      color: var(--color-secondary);
+    }
+
+    /* EV Station */
+    .parking-cell[data-status="ev"] {
+      box-shadow: 0 0 14px rgba(76, 215, 246, 0.12);
+    }
+
+    .parking-cell[data-status="ev"] .cell-id {
+      color: var(--color-tertiary);
+    }
+
+    .parking-cell[data-status="ev"] .material-symbols-outlined {
+      color: var(--color-tertiary);
+    }
+
+    .ev-charge-progress {
+      width: 100%;
+      height: 4px;
+      background-color: var(--color-surface-container-highest);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .ev-charge-bar {
+      height: 100%;
+      background-color: var(--color-tertiary);
+      border-radius: 999px;
+    }
+
+    /* Abonado */
+    .parking-cell[data-status="abonado"] .cell-id {
+      color: var(--color-secondary-fixed);
+    }
+
+    .parking-cell[data-status="abonado"] .material-symbols-outlined {
+      color: var(--color-secondary-fixed);
+    }
+
+    /* Bloqueada / Mantenimiento */
+    .parking-cell[data-status="bloqueada"] {
+      background: repeating-linear-gradient(45deg, #171f33, #171f33 10px, #222a3d 10px, #222a3d 20px);
+    }
+
+    .parking-cell[data-status="bloqueada"] .cell-id,
+    .parking-cell[data-status="bloqueada"] .cell-status-label {
+      color: var(--color-error);
+    }
+
+    /* Selected Cell State */
+    .parking-cell.selected {
+      background-color: var(--color-surface-container-highest);
+      box-shadow: 0 0 0 2px var(--color-primary), var(--card-shadow);
+      transform: scale(1.02);
+      z-index: 2;
+    }
+
+    .parking-cell.selected .cell-bottom-bar {
+      background-color: var(--color-surface-container);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* -------------------------------------------------------------
+       Colombian License Plate Widget
+    -------------------------------------------------------------- */
+    .plate-badge {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-secondary);
+      color: var(--color-on-secondary-fixed);
+      border-radius: 4px;
+      padding: 2px 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+      line-height: 1;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .plate-badge.plate-white {
+      background-color: #f1f3f9;
+      color: #0b1326;
+    }
+
+    .plate-text {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .plate-city {
+      font-family: var(--font-body);
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      opacity: 0.85;
+      margin-top: 1px;
+    }
+
+    .plate-badge-lg {
+      padding: 6px 20px;
+      border-radius: 6px;
+      width: 210px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .plate-badge-lg .plate-text {
+      font-size: 22px;
+      letter-spacing: 0.14em;
+    }
+
+    .plate-badge-lg .plate-city {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+    }
+
+    /* -------------------------------------------------------------
+       Driveway / Central Road
+    -------------------------------------------------------------- */
+    .calzada-roadway {
+      background-color: var(--color-surface-container-lowest);
+      padding: 12px 24px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .roadway-vector {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      color: var(--color-outline);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+    }
+
+    .road-dashes {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .dash-line {
+      display: inline-block;
+      width: 32px;
+      height: 4px;
+      background-color: rgba(60, 74, 66, 0.6);
+      border-radius: 999px;
+    }
+
+    /* -------------------------------------------------------------
+       Side Inspector Desk
+    -------------------------------------------------------------- */
+    .inspector-card {
+      background-color: var(--color-surface-container-low);
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: 84px;
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--color-surface-container-highest);
+      padding-bottom: 14px;
+    }
+
+    .inspector-icon-wrap {
+      padding: 8px;
+      border-radius: var(--radius-md);
+      background-color: var(--color-primary-container);
+      color: var(--color-on-primary-container);
+    }
+
+    .inspector-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .inspector-badge-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-primary);
+    }
+
+    .inspector-heading {
+      font-family: var(--font-headline);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+    }
+
+    .plate-spotlight-block {
+      background-color: var(--color-surface-container-lowest);
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .vehicle-model-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .vehicle-name {
+      font-family: var(--font-headline);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-on-surface);
+    }
+
+    .vehicle-color-chip {
+      background-color: var(--color-surface-container-high);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-outline);
+    }
+
+    .anpr-accuracy-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      color: var(--color-outline);
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .meta-2col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .meta-info-card {
+      background-color: var(--color-surface-container);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .meta-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--color-outline);
+      letter-spacing: 0.04em;
+    }
+
+    .meta-val {
+      font-weight: 600;
+      color: var(--color-on-surface);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tariff-summary-card {
+      background-color: var(--color-surface-container);
+      padding: 14px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .tariff-amount {
+      font-family: var(--font-headline);
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+
+    .novedad-alert-card {
+      background-color: rgba(147, 0, 10, 0.2);
+      border: 1px solid rgba(255, 180, 171, 0.25);
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .novedad-alert-card .warn-icon {
+      color: var(--color-error);
+      font-size: 26px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .novedad-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    .novedad-header {
+      font-family: var(--font-headline);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-error);
+    }
+
+    .novedad-chip {
+      background-color: rgba(147, 0, 10, 0.5);
+      color: var(--color-error);
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    .novedad-desc {
+      font-size: 12px;
+      color: var(--color-on-surface);
+      margin-top: 4px;
+      line-height: 1.4;
+    }
+
+    .novedad-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all var(--transition-default);
+    }
+
+    .action-btn-neutral {
+      background-color: var(--color-surface-container);
+      color: var(--color-on-surface);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .action-btn-neutral:hover {
+      background-color: var(--color-surface-container-high);
+    }
+
+    .action-btn-danger {
+      background-color: var(--color-error-container);
+      color: var(--color-on-error-container);
+    }
+
+    .action-btn-danger:hover {
+      background-color: #ba1a1a;
+      color: #fff;
+    }
+
+    .action-btn-primary {
+      background-color: var(--color-primary);
+      color: var(--color-on-primary);
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(78, 222, 163, 0.25);
+    }
+
+    .action-btn-primary:hover {
+      background-color: var(--color-primary-container);
+    }
+
+    /* -------------------------------------------------------------
+       Bottom Performance Metrics Bar
+    -------------------------------------------------------------- */
+    .telemetry-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .metric-card {
+      background-color: var(--color-surface-container-low);
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .metric-main-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .metric-icon-square {
+      padding: 12px;
+      background-color: var(--color-surface-container-highest);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .metric-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--color-outline);
+      letter-spacing: 0.04em;
+    }
+
+    .metric-value {
+      font-family: var(--font-headline);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-on-surface);
+      margin: 2px 0;
+    }
+
+    .metric-status-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .badge-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Progress Ring SVG */
+    .progress-ring {
+      width: 44px;
+      height: 44px;
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring__bg {
+      stroke: var(--color-surface-container-highest);
+      stroke-width: 4;
+      fill: none;
+    }
+
+    .progress-ring__bar {
+      stroke: var(--color-primary);
+      stroke-width: 4;
+      stroke-linecap: round;
+      fill: none;
+      stroke-dasharray: 100, 100;
+      stroke-dashoffset: 76;
+    }
+  </style>
+</head>
+<body>
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="app-sidebar">
+<div>
+<!-- Brand Header -->
+<div class="sidebar-brand">
+<img alt="Autos Colombia Logo" src="https://lh3.googleusercontent.com/aida/AEtjO1WsHH8JpVRtco0x5cAFaIviMWuwHyQ4kyqt5X1YaehEs3DqCZAlwfugKzwAjZhxETjbxzVEVpxrStxYEYpERuIA5bhcG-8uJ6Dn7NTQaxAVlyox0pUR4G1Ffb9PtAIE08MGZe5YHeXGjDfW17sMHU8H15ZfxrO7nOI8vAoFoMFw0dPVOxrnMby8OETLSf-ZVuwKHmS016MjGYbiOwoGtIrJRtoHgjXZl_mYo5bvxUTa34ZQwxABRh1xNA"/>
+<div class="brand-meta">
+<span class="brand-title">Autos Colombia</span>
+<span class="brand-subtitle">Control Operativo</span>
+</div>
+</div>
+<!-- Live Central Server Pill -->
+<div class="server-status-pill">
+<div style="display: flex; align-items: center; gap: 8px;">
+<span class="live-dot"></span>
+<span style="font-size: 11px; text-transform: uppercase; color: var(--color-on-surface-variant); font-weight: 600;">Servidor Central</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-primary);">En Línea</span>
+</div>
+<!-- Navigation Links -->
+<nav class="nav-list">
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 20px;">sync_alt</span>
+<span>Control Entradas/Salidas</span>
+</a>
+<a class="nav-item active" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">grid_view</span>
+<span>Mapa de Celdas</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">point_of_sale</span>
+<span>Caja y Pagos</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">report_problem</span>
+<span>Novedades y Daños</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size: 20px;">badge</span>
+<span>Mensualidades</span>
+</a>
+</nav>
+</div>
+<!-- Sidebar Bottom Status -->
+<div class="sidebar-footer">
+<div class="barreras-row">
+<span>BARRERAS VEHICULARES</span>
+<span style="color: var(--color-primary);">ARM-2 OK</span>
+</div>
+<div class="camera-lpr-chip">
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 16px;">videocam</span>
+<span>LPR Cámara L1: Activa</span>
+</div>
+</div>
+</aside>
+<!-- ==================== MAIN CONTENT WRAPPER ==================== -->
+<div class="main-wrapper">
+<!-- Fixed Top Header -->
+<header class="app-header">
+<!-- Left Header Widgets -->
+<div class="header-left">
+<div class="header-stat-box">
+<span class="material-symbols-outlined" style="color: var(--color-outline); font-size: 18px;">schedule</span>
+<div style="display: flex; flex-direction: column; line-height: 1.15;">
+<span class="stat-clock">14:28:42</span>
+<span class="stat-subtext">Bogotá (UTC-5)</span>
+</div>
+</div>
+<div class="header-stat-box">
+<div style="display: flex; flex-direction: column;">
+<span style="font-size: 10px; text-transform: uppercase; color: var(--color-outline);">Ocupación Total</span>
+<span style="font-family: var(--font-mono); font-size: 14px; font-weight: 700;">
+              142/200 <span style="color: var(--color-secondary); font-size: 12px; font-weight: 400;">Celdas (71%)</span>
+</span>
+</div>
+<div class="stat-progress-bar">
+<div class="stat-progress-fill" style="width: 71%;"></div>
+</div>
+</div>
+<div class="header-stat-box" style="background-color: var(--color-surface-container-high);">
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">payments</span>
+<div style="display: flex; flex-direction: column; line-height: 1.15;">
+<span style="font-size: 10px; text-transform: uppercase; color: var(--color-on-surface-variant);">Tarifa Fracción</span>
+<span style="font-family: var(--font-mono); font-size: 12px; font-weight: 700;">$110 COP / Min</span>
+</div>
+</div>
+</div>
+<!-- Right Header Actions & Operator -->
+<div class="header-right">
+<button class="alert-gate-btn" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">e911_emergency</span>
+<span>Alerta Barricada</span>
+</button>
+<div class="user-profile-badge">
+<div style="text-align: right; line-height: 1.2;">
+<div style="font-weight: 600; font-size: 14px;">Juan Montalvo</div>
+<div style="font-size: 10px; color: var(--color-primary); text-transform: uppercase; font-weight: 700;">Operador Cabina 1</div>
+</div>
+<img alt="Juan Montalvo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACx_nTeMJpqXQk-By8tG5_bOyLiK6N_8u5gJfYn2X8XV6EaJIMxkO9y8UzbcrCyaAef5JFYrZnZ7XggO0d_PzoHvhcG-nYOYI7YmENSjK-1TZ5fLDr5kYqod3uUs_YBgSHtKCCZsuQexw35ImZmXzdM7jpE6fNmtWAqtRXtSqnBsTJ-tHAuucWRWzXnwNO0HeRD0I1FQX-1It_0bJrudaYV8quA_yQc4nG8fHHu6jDx0U7I1emdLLn"/>
+</div>
+</div>
+</header>
+<!-- Page Body Area -->
+<main class="main-content">
+<!-- Telemetry Subtitle & Action Header -->
+<div class="page-header-row">
+<div>
+<div class="breadcrumb-telemetry">
+<span class="material-symbols-outlined" style="font-size: 16px;">grid_view</span>
+<span>Telemetría de Bahías · Lote 01 Calle 72</span>
+</div>
+<div style="margin-top: 4px; display: flex; align-items: baseline; gap: 12px;">
+<h1 class="page-title">Mapa Esquemático de Celdas</h1>
+<span class="sync-badge">Sincronización ultrasónica: 0.8s</span>
+</div>
+</div>
+<div class="action-btn-group">
+<button class="control-btn" id="zoomResetBtn">
+<span class="material-symbols-outlined" style="font-size: 16px;">center_focus_strong</span>
+<span>Centrar Plano</span>
+</button>
+<button class="control-btn text-accent" id="refreshSensorsBtn">
+<span class="material-symbols-outlined" style="font-size: 16px;">sensors</span>
+<span>Escanear LPR/Ultrasonido</span>
+</button>
+</div>
+</div>
+<!-- Levels Selector Tabs -->
+<div class="levels-bar">
+<button class="level-tab active" data-level="1">
+<span class="material-symbols-outlined" style="font-size: 18px;">layers</span>
+<span>Piso 1 - Principal (A01-A50)</span>
+<span class="pill-counter">38/50</span>
+</button>
+<button class="level-tab" data-level="2">
+<span class="material-symbols-outlined" style="font-size: 18px;">roofing</span>
+<span>Piso 2 - Cubierto (B01-B50)</span>
+<span class="pill-counter">42/50</span>
+</button>
+<button class="level-tab" data-level="s">
+<span class="material-symbols-outlined" style="font-size: 18px;">ev_station</span>
+<span>Sótano - Celdas Exclusivas y EV (C01-C50)</span>
+<span class="pill-counter">49/50</span>
+</button>
+<button class="level-tab" data-level="m">
+<span class="material-symbols-outlined" style="font-size: 18px;">two_wheeler</span>
+<span>Bahía Exterior - Motos y Carga</span>
+<span class="pill-counter">13/50</span>
+</button>
+</div>
+<!-- Filters & Legend Toolbar -->
+<div class="filters-bar">
+<div class="search-terminal">
+<span class="material-symbols-outlined search-icon">search</span>
+<input class="search-input" id="searchInput" placeholder="Buscar placa, celda (e.g. A-14) o abonado..." type="text"/>
+<span class="search-shortcut">⌘K</span>
+</div>
+<div class="filter-pills-list">
+<button class="filter-chip active" data-filter="all">
+<span>Todas</span>
+<span class="chip-count">200</span>
+</button>
+<button class="filter-chip" data-filter="disponible" style="color: var(--color-primary);">
+<span class="chip-dot" style="background-color: var(--color-primary);"></span>
+<span>Disponibles</span>
+<span class="chip-count">58</span>
+</button>
+<button class="filter-chip" data-filter="ocupada" style="color: var(--color-secondary);">
+<span class="chip-dot" style="background-color: var(--color-secondary);"></span>
+<span>Ocupadas</span>
+<span class="chip-count">128</span>
+</button>
+<button class="filter-chip" data-filter="ev" style="color: var(--color-tertiary);">
+<span class="chip-dot" style="background-color: var(--color-tertiary);"></span>
+<span>Cargador EV</span>
+<span class="chip-count">8</span>
+</button>
+<button class="filter-chip" data-filter="abonado" style="color: var(--color-secondary-fixed);">
+<span class="chip-dot" style="background-color: var(--color-secondary-fixed);"></span>
+<span>Abonados</span>
+<span class="chip-count">10</span>
+</button>
+<button class="filter-chip" data-filter="bloqueada" style="color: var(--color-error);">
+<span class="chip-dot" style="background-color: var(--color-error);"></span>
+<span>Mantenimiento</span>
+<span class="chip-count">4</span>
+</button>
+</div>
+<div class="legend-strip">
+<span style="color: var(--color-outline); text-transform: uppercase;">Convención:</span>
+<span class="legend-item" style="color: var(--color-primary);"><span class="legend-dot" style="background-color: var(--color-primary);"></span>Libre</span>
+<span class="legend-item" style="color: var(--color-secondary);"><span class="legend-dot" style="background-color: var(--color-secondary);"></span>Ocupada</span>
+<span class="legend-item" style="color: var(--color-tertiary);"><span class="legend-dot" style="background-color: var(--color-tertiary);"></span>Carga EV</span>
+<span class="legend-item" style="color: var(--color-secondary-fixed);"><span class="legend-dot" style="background-color: var(--color-secondary-fixed);"></span>Abonado</span>
+<span class="legend-item" style="color: var(--color-error);"><span class="legend-dot" style="background-color: var(--color-error);"></span>Bloqueo</span>
+</div>
+</div>
+<!-- Two Column Layout: Plan Map + Live Inspector -->
+<div class="dashboard-grid">
+<!-- LEFT: Schematic Floorplan -->
+<div class="floorplan-container">
+<!-- Bay Row North (A-01 to A-08) -->
+<div class="bay-module">
+<div class="bay-module-header">
+<div class="bay-module-title">
+<span style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-primary);"></span>
+<span>Fila Norte · Módulo A (Entrada Principal)</span>
+</div>
+<span class="bay-status-tag">Sensores Techo: 8/8 Verificados</span>
+</div>
+<div class="cells-grid">
+<!-- A-01: Disponible -->
+<div class="parking-cell" data-cell="A-01" data-status="disponible">
+<div class="cell-top-bar">
+<span class="cell-id">A-01</span>
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label">DISPONIBLE</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-outline);">Libre hace 14m</span>
+</div>
+<button class="cell-assign-btn">Asignar</button>
+</div>
+<!-- A-02: Ocupada (Placa Amarilla) -->
+<div class="parking-cell" data-cell="A-02" data-status="ocupada">
+<div class="cell-top-bar">
+<span class="cell-id">A-02</span>
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">GHY-512</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant); margin-top: 4px;">1h 12m</span>
+</div>
+<div class="cell-bottom-bar">
+<span>$7.920</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">check_circle</span>
+</div>
+</div>
+<!-- A-03: Taxi / Placa Blanca -->
+<div class="parking-cell" data-cell="A-03" data-status="ocupada">
+<div class="cell-top-bar">
+<span class="cell-id">A-03</span>
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">local_taxi</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge plate-white">
+<span class="plate-text">WTL-289</span>
+<span class="plate-city">SOACHA</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant); margin-top: 4px;">0h 42m</span>
+</div>
+<div class="cell-bottom-bar">
+<span>$4.620</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">check_circle</span>
+</div>
+</div>
+<!-- A-04: EV Charging -->
+<div class="parking-cell" data-cell="A-04" data-status="ev">
+<div class="cell-top-bar">
+<span class="cell-id">A-04</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">BYD-802</span>
+<span class="plate-city">MEDELLÍN</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-tertiary); font-weight: 700; margin-top: 4px;">78% • 22 kW</span>
+</div>
+<div class="ev-charge-progress">
+<div class="ev-charge-bar" style="width: 78%;"></div>
+</div>
+</div>
+<!-- A-05: Abonado -->
+<div class="parking-cell" data-cell="A-05" data-status="abonado">
+<div class="cell-top-bar">
+<span class="cell-id">A-05</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">badge</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">KRM-930</span>
+<span class="plate-city">ENVIGADO</span>
+</div>
+<span style="font-size: 10px; text-transform: uppercase; color: var(--color-secondary-fixed); margin-top: 4px; font-weight: 600;">Abonado Plan Oro</span>
+</div>
+<div class="cell-bottom-bar">
+<span>Tarifa Plana</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">verified</span>
+</div>
+</div>
+<!-- A-06: Bloqueada / Mantenimiento -->
+<div class="parking-cell" data-cell="A-06" data-status="bloqueada">
+<div class="cell-top-bar">
+<span class="cell-id">A-06</span>
+<span class="material-symbols-outlined" style="color: var(--color-error); font-size: 18px;">construction</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label" style="font-size: 11px; font-weight: 700;">BLOQUEADA</span>
+<span style="font-family: var(--font-mono); font-size: 10px; color: var(--color-outline); margin-top: 2px;">Sensor LPR Inactivo</span>
+</div>
+<div class="cell-bottom-bar" style="justify-content: center; color: var(--color-error);">
+<span>Revisión Téc.</span>
+</div>
+</div>
+<!-- A-07: Disponible -->
+<div class="parking-cell" data-cell="A-07" data-status="disponible">
+<div class="cell-top-bar">
+<span class="cell-id">A-07</span>
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label">DISPONIBLE</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-outline);">Libre hace 2h</span>
+</div>
+<button class="cell-assign-btn">Asignar</button>
+</div>
+<!-- A-08: Ocupada -->
+<div class="parking-cell" data-cell="A-08" data-status="ocupada">
+<div class="cell-top-bar">
+<span class="cell-id">A-08</span>
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">TZS-104</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant); margin-top: 4px;">2h 15m</span>
+</div>
+<div class="cell-bottom-bar">
+<span>$14.850</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">check_circle</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Central Driveway & PTZ Camera Indicator -->
+<div class="calzada-roadway">
+<div class="roadway-vector">
+<div style="display: flex; align-items: center; gap: 6px;">
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">arrow_forward</span>
+<span style="font-weight: 700;">SENTIDO VIAL • CALZADA PRINCIPAL LOTE 1</span>
+</div>
+<span style="color: var(--color-primary);">Límite 10 km/h</span>
+</div>
+<div class="road-dashes">
+<span class="dash-line"></span>
+<span class="dash-line"></span>
+<span class="dash-line"></span>
+<span class="dash-line"></span>
+<span class="dash-line"></span>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; color: var(--color-outline); font-family: var(--font-mono); font-size: 11px;">
+<span class="material-symbols-outlined" style="font-size: 16px;">emergency_recording</span>
+<span>CÁMARA DOMO PTZ-03 ACTIVA</span>
+</div>
+</div>
+<!-- Bay Row South (A-09 to A-16) With Highlight Target A-14 -->
+<div class="bay-module">
+<div class="bay-module-header">
+<div class="bay-module-title">
+<span style="width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-secondary);"></span>
+<span>Fila Sur · Módulo A (Salida Hacia Carrera 15)</span>
+</div>
+<span class="bay-status-tag">Ocupación Fila: 75%</span>
+</div>
+<div class="cells-grid">
+<!-- A-09: Disponible -->
+<div class="parking-cell" data-cell="A-09" data-status="disponible">
+<div class="cell-top-bar">
+<span class="cell-id">A-09</span>
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label">DISPONIBLE</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-outline);">Libre hace 4m</span>
+</div>
+<button class="cell-assign-btn">Asignar</button>
+</div>
+<!-- A-10: Moto Ocupada -->
+<div class="parking-cell" data-cell="A-10" data-status="ocupada">
+<div class="cell-top-bar">
+<span class="cell-id">A-10</span>
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">two_wheeler</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">DRX-44F</span>
+<span class="plate-city">CALI</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant); margin-top: 4px;">0h 55m</span>
+</div>
+<div class="cell-bottom-bar">
+<span>$3.300</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">check_circle</span>
+</div>
+</div>
+<!-- A-11: EV -->
+<div class="parking-cell" data-cell="A-11" data-status="ev">
+<div class="cell-top-bar">
+<span class="cell-id">A-11</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">bolt</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">EVX-910</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-tertiary); font-weight: 700; margin-top: 4px;">92% • 11 kW</span>
+</div>
+<div class="ev-charge-progress">
+<div class="ev-charge-bar" style="width: 92%;"></div>
+</div>
+</div>
+<!-- A-12: Disponible -->
+<div class="parking-cell" data-cell="A-12" data-status="disponible">
+<div class="cell-top-bar">
+<span class="cell-id">A-12</span>
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label">DISPONIBLE</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-outline);">Libre hace 31m</span>
+</div>
+<button class="cell-assign-btn">Asignar</button>
+</div>
+<!-- A-13: Ocupada -->
+<div class="parking-cell" data-cell="A-13" data-status="ocupada">
+<div class="cell-top-bar">
+<span class="cell-id">A-13</span>
+<span class="material-symbols-outlined" style="color: var(--color-secondary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">LKJ-893</span>
+<span class="plate-city">BUCARAMANGA</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant); margin-top: 4px;">1h 05m</span>
+</div>
+<div class="cell-bottom-bar">
+<span>$7.150</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">check_circle</span>
+</div>
+</div>
+<!-- A-14: TARGET ACTIVE SELECTED (Inspector Focus) -->
+<div class="parking-cell selected" data-cell="A-14" data-status="ocupada">
+<div class="cell-top-bar">
+<div style="display: flex; align-items: center; gap: 6px;">
+<span class="cell-id" style="color: var(--color-primary);">A-14</span>
+<span style="width: 6px; height: 6px; border-radius: 50%; background-color: var(--color-primary);"></span>
+</div>
+<div style="display: flex; align-items: center; gap: 4px; background-color: var(--color-error-container); color: var(--color-on-error-container); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 10px;">
+<span class="material-symbols-outlined" style="font-size: 12px;">report_problem</span>
+<span>Novedad</span>
+</div>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge" style="transform: scale(1.05);">
+<span class="plate-text">WXY-782</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-primary); font-weight: 700; margin-top: 4px;">3h 57m (Activo)</span>
+</div>
+<div class="cell-bottom-bar">
+<span style="color: var(--color-secondary); font-weight: 700;">$26.070 COP</span>
+<span style="color: var(--color-primary); font-weight: 700;">SELECCIONADA</span>
+</div>
+</div>
+<!-- A-15: Abonado -->
+<div class="parking-cell" data-cell="A-15" data-status="abonado">
+<div class="cell-top-bar">
+<span class="cell-id">A-15</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">badge</span>
+</div>
+<div class="cell-center-body">
+<div class="plate-badge">
+<span class="plate-text">NKO-419</span>
+<span class="plate-city">CHÍA</span>
+</div>
+<span style="font-size: 10px; text-transform: uppercase; color: var(--color-secondary-fixed); margin-top: 4px; font-weight: 600;">Abonado Médico</span>
+</div>
+<div class="cell-bottom-bar">
+<span>Pensión Mensual</span>
+<span class="material-symbols-outlined" style="font-size: 14px; color: var(--color-primary);">verified</span>
+</div>
+</div>
+<!-- A-16: Disponible -->
+<div class="parking-cell" data-cell="A-16" data-status="disponible">
+<div class="cell-top-bar">
+<span class="cell-id">A-16</span>
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 18px;">directions_car</span>
+</div>
+<div class="cell-center-body">
+<span class="cell-status-label">DISPONIBLE</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-outline);">Libre hace 52m</span>
+</div>
+<button class="cell-assign-btn">Asignar</button>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT: Live Inspector Side Desk -->
+<aside class="inspector-card">
+<!-- Inspector Header -->
+<div class="inspector-header">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="inspector-icon-wrap">
+<span class="material-symbols-outlined" style="font-size: 20px;">tune</span>
+</div>
+<div class="inspector-titles">
+<span class="inspector-badge-label">Inspector Operativo</span>
+<h2 class="inspector-heading" id="inspectedCellTitle">Celda A-14 • Ocupada</h2>
+</div>
+</div>
+<span style="width: 10px; height: 10px; border-radius: 50%; background-color: var(--color-secondary); box-shadow: 0 0 10px var(--color-secondary);" title="Estado: Ocupado en tiempo real"></span>
+</div>
+<!-- Colombian License Plate Spotlight Block -->
+<div class="plate-spotlight-block">
+<div class="plate-badge plate-badge-lg">
+<span class="plate-text" id="inspectedPlate">WXY-782</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<div class="vehicle-model-row">
+<span class="vehicle-name">Mazda CX-30 Grand Touring</span>
+<span class="vehicle-color-chip">Gris Carbono</span>
+</div>
+<div class="anpr-accuracy-row">
+<span class="material-symbols-outlined" style="color: var(--color-primary); font-size: 15px;">verified_user</span>
+<span>ANPR Match: 99.8% • Cámara Entrada L1</span>
+</div>
+</div>
+<!-- Driver & Dwell Metrics -->
+<div class="meta-2col-grid">
+<div class="meta-info-card">
+<span class="meta-label">Abonado / Conductor</span>
+<span class="meta-val">Carlos E. Restrepo</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-primary); margin-top: 2px;">Mensualidad Activa</span>
+</div>
+<div class="meta-info-card">
+<span class="meta-label">Hora Ingreso</span>
+<span class="meta-val" style="font-family: var(--font-headline); font-size: 15px;">07:45:18 AM</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--color-secondary); font-weight: 700; margin-top: 2px;">Estancia: 3h 57m</span>
+</div>
+</div>
+<!-- Tariff & Live Balance Accumulator -->
+<div class="tariff-summary-card">
+<div>
+<span class="meta-label">Subtotal Acumulado</span>
+<div class="tariff-amount">$26.070 <span style="font-size: 11px; font-weight: 400; color: var(--color-outline);">COP</span></div>
+</div>
+<div style="text-align: right;">
+<span class="meta-label">Tipo Tarifa</span>
+<div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-on-surface-variant);">Fracción $110/min</div>
+<div style="font-family: var(--font-mono); font-size: 11px; color: var(--color-secondary);">Descuento Abonado -15%</div>
+</div>
+</div>
+<!-- Novedad Alert Notice -->
+<div class="novedad-alert-card">
+<span class="material-symbols-outlined warn-icon">warning</span>
+<div style="flex: 1;">
+<div class="novedad-title-row">
+<span class="novedad-header">Novedad Física Registrada</span>
+<span class="novedad-chip">ID #NOV-994</span>
+</div>
+<p class="novedad-desc">
+                "Raspón leve de 12cm en puerta trasera derecha detectado por scanner fotográfico perimetral al cruzar talanquera L1."
+              </p>
+<div class="novedad-footer">
+<span style="font-family: var(--font-mono); font-size: 10px; color: var(--color-outline);">07:45 AM · Operador: J. Montalvo</span>
+<button style="font-size: 10px; font-weight: 600; color: var(--color-tertiary); text-decoration: underline; text-transform: uppercase; cursor: pointer;">VER EVIDENCIA (2 FOTOS)</button>
+</div>
+</div>
+</div>
+<!-- Cabina Action Buttons -->
+<div>
+<span style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; color: var(--color-outline); display: block; margin-bottom: 8px;">Acciones de Cabina</span>
+<div class="actions-grid">
+<button class="action-btn action-btn-neutral">
+<span class="material-symbols-outlined" style="font-size: 16px;">receipt_long</span>
+<span>Reimprimir Ticket</span>
+</button>
+<button class="action-btn action-btn-neutral">
+<span class="material-symbols-outlined" style="font-size: 16px;">chevron_forward</span>
+<span>Reubicar Celda</span>
+</button>
+</div>
+<div class="actions-grid" style="margin-top: 8px;">
+<button class="action-btn action-btn-danger">
+<span class="material-symbols-outlined" style="font-size: 16px;">no_meeting_room</span>
+<span>Bloquear Celda</span>
+</button>
+<button class="action-btn action-btn-primary">
+<span class="material-symbols-outlined" style="font-size: 16px;">check</span>
+<span>Liberar y Cobrar</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- BOTTOM TELEMETRY STRIP -->
+<div class="telemetry-metrics-grid">
+<!-- Metric 1: Tarifa Dinámica -->
+<div class="metric-card">
+<div class="metric-main-group">
+<div class="metric-icon-square" style="color: var(--color-secondary);">
+<span class="material-symbols-outlined" style="font-size: 24px;">trending_up</span>
+</div>
+<div class="metric-details">
+<span class="metric-label">Tarifa Dinámica Minuto</span>
+<span class="metric-value">$110 COP</span>
+<span class="metric-status-sub" style="color: var(--color-secondary);">Hora Pico Activa (12:00 - 15:30)</span>
+</div>
+</div>
+<span class="badge-pill" style="color: var(--color-primary); background-color: rgba(78, 222, 163, 0.1);">+15% Pico</span>
+</div>
+<!-- Metric 2: Tasa de Rotación -->
+<div class="metric-card">
+<div class="metric-main-group">
+<div class="metric-icon-square" style="color: var(--color-primary);">
+<span class="material-symbols-outlined" style="font-size: 24px;">autorenew</span>
+</div>
+<div class="metric-details">
+<span class="metric-label">Tasa de Rotación</span>
+<span class="metric-value">2.8 <span style="font-size: 12px; font-weight: 400; color: var(--color-outline);">veh/celda/día</span></span>
+<span class="metric-status-sub" style="color: var(--color-on-surface-variant);">426 vehículos hoy</span>
+</div>
+</div>
+<span class="badge-pill" style="color: var(--color-primary); background-color: rgba(78, 222, 163, 0.1);">↑ 0.4 vs ayer</span>
+</div>
+<!-- Metric 3: Reservas / Abonados -->
+<div class="metric-card">
+<div class="metric-main-group">
+<div class="metric-icon-square" style="color: var(--color-tertiary);">
+<span class="material-symbols-outlined" style="font-size: 24px;">book_online</span>
+</div>
+<div class="metric-details">
+<span class="metric-label">Celdas Reservadas Hoy</span>
+<span class="metric-value">14 / 20 <span style="font-size: 12px; font-weight: 400; color: var(--color-outline);">Asignadas</span></span>
+<span class="metric-status-sub" style="color: var(--color-tertiary);">6 pendientes por llegar</span>
+</div>
+</div>
+<span class="badge-pill" style="color: var(--color-outline);">70% Cupo</span>
+</div>
+<!-- Metric 4: Tasa de Disponibilidad -->
+<div class="metric-card">
+<div class="metric-main-group">
+<div class="metric-icon-square" style="color: var(--color-primary);">
+<span class="material-symbols-outlined" style="font-size: 24px;">space_dashboard</span>
+</div>
+<div class="metric-details">
+<span class="metric-label">Disponibilidad en Piso 1</span>
+<span class="metric-value" style="color: var(--color-primary);">12 Celdas</span>
+<span class="metric-status-sub" style="color: var(--color-outline);">Capacidad Restante: 24%</span>
+</div>
+</div>
+<svg class="progress-ring" viewbox="0 0 36 36">
+<path class="progress-ring__bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+<path class="progress-ring__bar" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"></path>
+</svg>
+</div>
+</div>
+</main>
+</div>
+<!-- Micro-Interactions Script -->
+<script>
+    (function initParkingMap() {
+      const cells = document.querySelectorAll('.parking-cell');
+      const filterChips = document.querySelectorAll('.filter-chip');
+      const levelTabs = document.querySelectorAll('.level-tab');
+      const searchInput = document.getElementById('searchInput');
+      const inspectedTitle = document.getElementById('inspectedCellTitle');
+      const inspectedPlate = document.getElementById('inspectedPlate');
+
+      // Cell Selection
+      cells.forEach(cell => {
+        cell.addEventListener('click', () => {
+          cells.forEach(c => c.classList.remove('selected'));
+          cell.classList.add('selected');
+
+          const cellId = cell.getAttribute('data-cell') || 'A-XX';
+          const status = cell.getAttribute('data-status') || 'ocupada';
+          const plateEl = cell.querySelector('.plate-text');
+
+          if (inspectedTitle) {
+            inspectedTitle.textContent = 'Celda ' + cellId + ' • ' + status.toUpperCase();
+          }
+
+          if (inspectedPlate && plateEl) {
+            inspectedPlate.textContent = plateEl.textContent.trim();
+          } else if (inspectedPlate && status === 'disponible') {
+            inspectedPlate.textContent = 'LIBRE';
+          }
+        });
+      });
+
+      // Filter Logic
+      filterChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          filterChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+
+          const filterVal = chip.getAttribute('data-filter');
+          cells.forEach(cell => {
+            const cellStatus = cell.getAttribute('data-status');
+            if (filterVal === 'all' || cellStatus === filterVal) {
+              cell.style.display = 'flex';
+            } else {
+              cell.style.display = 'none';
+            }
+          });
+        });
+      });
+
+      // Level Tabs Switch
+      levelTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          levelTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+        });
+      });
+
+      // Search Filter
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const query = (e.target.value || '').toLowerCase().trim();
+          cells.forEach(cell => {
+            const textContent = cell.textContent.toLowerCase();
+            if (textContent.includes(query)) {
+              cell.style.display = 'flex';
+            } else {
+              cell.style.display = 'none';
+            }
+          });
+        });
+      }
+
+      // Keyboard Shortcut ⌘K
+      window.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+          e.preventDefault();
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+        }
+      });
+    })();
+  </script>
+</body></html>
