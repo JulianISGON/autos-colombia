@@ -137,7 +137,3 @@ npm run build
 ```
 
 También se verificaron los flujos de entrada con novedad, prevención de entrada duplicada, rechazo de mensualidad vencida, consulta de presentes y salida con liberación de celda.
-
-## Alcance pendiente
-
-Esta primera entrega no incluye autenticación, gestión de usuarios, pagos reales, facturación DIAN, reservas, reportes, integración con cámaras LPR ni administración avanzada de celdas. Esos módulos pueden incorporarse en iteraciones posteriores.
