@@ -3,6 +3,23 @@ export interface EntradaRequest {
   observacionNovedad?: string;
 }
 
+export type EstadoMensualidad = 'ACTIVA' | 'VENCIDA';
+export type EstadoCelda = 'DISPONIBLE' | 'OCUPADA' | 'MANTENIMIENTO';
+
+export interface Usuario {
+  id_usuario: number;
+  identificacion: string;
+  nombre: string;
+  telefono: string;
+  estado_mensualidad: EstadoMensualidad;
+}
+
+export interface Vehiculo {
+  placa: string;
+  id_usuario: number;
+  tipo_vehiculo: string;
+}
+
 export interface SalidaRequest {
   placa: string;
 }
@@ -31,7 +48,7 @@ export interface VehiculoConUsuario {
   identificacion: string;
   nombre: string;
   telefono: string;
-  estado_mensualidad: string;
+  estado_mensualidad: EstadoMensualidad;
 }
 
 export interface Presente {
@@ -44,7 +61,7 @@ export interface Presente {
 export interface CeldaEstado {
   id_celda: number;
   numero_celda: string;
-  estado: 'DISPONIBLE' | 'OCUPADA';
+  estado: EstadoCelda;
   placa: string | null;
   fecha_ingreso: string | null;
 }
@@ -58,4 +75,8 @@ export interface SalidaResult {
   placa: string;
   fecha_salida: string;
   celda: string;
+}
+
+export interface UsuarioConVehiculos extends Usuario {
+  vehiculos: Vehiculo[];
 }

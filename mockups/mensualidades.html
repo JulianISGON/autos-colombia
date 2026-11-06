@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gestión de Mensualidades y Abonados VIP - Autos Colombia</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* CSS Reset & Variables */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0b1326;
+      --surface-lowest: #060e20;
+      --surface: #0b1326;
+      --surface-low: #131b2e;
+      --surface-card: #171f33;
+      --surface-high: #222a3d;
+      --surface-highest: #2d3449;
+      --surface-bright: #31394d;
+      
+      --text-main: #dae2fd;
+      --text-muted: #86948a;
+      --text-sub: #bbcabf;
+      
+      --primary: #4edea3;
+      --primary-container: #10b981;
+      --on-primary: #003824;
+      --on-primary-container: #00422b;
+      
+      --secondary: #ffb95f;
+      --secondary-amber: #ee9800;
+      --on-secondary-amber: #472a00;
+      
+      --tertiary: #4cd7f6;
+      --tertiary-container: #00b2d0;
+      
+      --error: #ff6b6b;
+      --error-container: #93000a;
+      --on-error: #ffffff;
+      --on-error-container: #ffdad6;
+      
+      --plate-yellow: #f59e0b;
+      --plate-black: #000000;
+      
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-title: 'Space Grotesk', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.4;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      display: none;
+    }
+    html {
+      scrollbar-width: none;
+    }
+
+    /* Material Symbols Icon */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      vertical-align: middle;
+      font-feature-settings: 'liga';
+    }
+
+    /* Layout Shell */
+    .app-sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 280px;
+      background-color: var(--surface-low);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 50;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .main-wrapper {
+      margin-left: 280px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-navbar {
+      position: sticky;
+      top: 0;
+      height: 64px;
+      background-color: rgba(11, 19, 38, 0.92);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 40;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .content-area {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Sidebar Components */
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon-box {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background-color: var(--primary-container);
+      color: var(--on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+
+    .brand-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .server-status-pill {
+      background-color: var(--surface-card);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-sub);
+    }
+
+    .pulse-dot-container {
+      position: relative;
+      display: inline-flex;
+      width: 8px;
+      height: 8px;
+    }
+
+    .pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: var(--primary);
+      opacity: 0.75;
+      animation: pulsePing 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+    }
+
+    .pulse-dot {
+      position: relative;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--primary-container);
+    }
+
+    @keyframes pulsePing {
+      75%, 100% {
+        transform: scale(2.2);
+        opacity: 0;
+      }
+    }
+
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 0 12px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: var(--text-sub);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .nav-link:hover {
+      background-color: var(--surface-high);
+      color: #ffffff;
+    }
+
+    .nav-link.active {
+      background-color: var(--primary-container);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      background-color: var(--surface-card);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .sensor-ok {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-sub);
+    }
+
+    /* Top Navbar Items */
+    .nav-stats-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .time-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--surface-card);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.03em;
+    }
+
+    .occupancy-widget {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: var(--surface-card);
+      padding: 6px 14px;
+      border-radius: 6px;
+    }
+
+    .occupancy-progress {
+      width: 130px;
+      height: 6px;
+      background-color: var(--surface-highest);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+
+    .occupancy-fill {
+      width: 71%;
+      height: 100%;
+      background-color: var(--primary-container);
+      border-radius: 9999px;
+    }
+
+    .rate-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--surface-card);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    .nav-actions-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-alert {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: var(--error-container);
+      color: var(--on-error-container);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-family: var(--font-title);
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .btn-alert:hover {
+      background-color: #b91c1c;
+      color: #fff;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: var(--surface-low);
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--on-primary);
+    }
+
+    /* Page Header Section */
+    .header-banner {
+      background-color: var(--surface-low);
+      border-radius: 8px;
+      padding: 20px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .header-titles {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .header-main-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .header-icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      background-color: var(--primary-container);
+      color: var(--on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-title-text {
+      font-family: var(--font-title);
+      font-size: 21px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .badge-pill-lpr {
+      background-color: var(--surface-highest);
+      color: var(--primary);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+
+    .header-sub-text {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .header-buttons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-title);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-secondary-surface {
+      background-color: var(--surface-high);
+      color: var(--text-main);
+    }
+    .btn-secondary-surface:hover {
+      background-color: var(--surface-bright);
+    }
+
+    .btn-amber {
+      background-color: var(--secondary-amber);
+      color: #ffffff;
+      font-weight: 700;
+    }
+    .btn-amber:hover {
+      background-color: #d97706;
+    }
+
+    .btn-primary-green {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      font-weight: 700;
+    }
+    .btn-primary-green:hover {
+      background-color: #34d399;
+    }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 1200px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 640px) {
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .kpi-card {
+      background-color: var(--surface-low);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .kpi-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .kpi-title {
+      font-size: 11.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .kpi-number-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .kpi-value-big {
+      font-family: var(--font-title);
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+
+    .kpi-footer-row {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+
+    /* Filter & Search Bar */
+    .toolbar-container {
+      background-color: var(--surface-low);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 300px;
+      display: flex;
+      align-items: center;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--surface-lowest);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 6px;
+      padding: 10px 12px 10px 40px;
+      color: var(--text-main);
+      font-family: var(--font-body);
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    .esc-tag {
+      position: absolute;
+      right: 10px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      background-color: var(--surface-card);
+      padding: 3px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .filter-chips-list {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .filter-chip {
+      background-color: var(--surface-card);
+      border: none;
+      border-radius: 6px;
+      padding: 8px 14px;
+      color: var(--text-main);
+      font-family: var(--font-title);
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      transition: background-color 0.2s;
+    }
+
+    .filter-chip:hover {
+      background-color: var(--surface-high);
+    }
+
+    .filter-chip.active {
+      background-color: var(--primary-container);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .dot-bullet {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+    }
+
+    /* Main Grid Workbench */
+    .workbench-grid {
+      display: grid;
+      grid-template-columns: 8fr 4fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .workbench-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .contracts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Contract Card */
+    .contract-card {
+      background-color: var(--surface-low);
+      border-radius: 8px;
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      transition: background-color 0.15s, border-color 0.15s;
+    }
+
+    .contract-card:hover {
+      background-color: rgba(23, 31, 51, 0.7);
+      border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .card-row-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .contractor-info-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    /* Colombian License Plate */
+    .colombia-plate {
+      background-color: var(--plate-yellow);
+      color: var(--plate-black);
+      border-radius: 5px;
+      padding: 4px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+      border: 1.5px solid #d97706;
+      width: 110px;
+      min-width: 110px;
+    }
+
+    .plate-code {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      line-height: 1;
+      color: #000;
+    }
+
+    .plate-city {
+      font-family: var(--font-mono);
+      font-size: 7.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 2px;
+      line-height: 1;
+      color: #000;
+    }
+
+    .contractor-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .contractor-name-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .contractor-title {
+      font-family: var(--font-title);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .id-tag {
+      background-color: var(--surface-highest);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-sub);
+    }
+
+    .plan-tag-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .tariff-status-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .status-badge {
+      font-family: var(--font-title);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-active {
+      background-color: var(--primary-container);
+      color: #ffffff;
+    }
+
+    .status-warning {
+      background-color: var(--secondary-amber);
+      color: #ffffff;
+    }
+
+    .status-danger {
+      background-color: #ef4444;
+      color: #ffffff;
+    }
+
+    .tariff-amount {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    .tariff-unit {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+
+    .card-row-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      flex-wrap: wrap;
+      font-size: 12.5px;
+      color: var(--text-sub);
+    }
+
+    .expiry-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-sm-action {
+      background-color: var(--surface-high);
+      color: var(--text-main);
+      border: none;
+      border-radius: 4px;
+      padding: 5px 10px;
+      font-family: var(--font-title);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background-color 0.15s;
+    }
+
+    .btn-sm-action:hover {
+      background-color: var(--surface-bright);
+    }
+
+    .alert-banner-mora {
+      background-color: rgba(147, 0, 10, 0.25);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 6px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Corporate Fleet Plate Badges */
+    .plate-badge-sm {
+      background-color: var(--plate-yellow);
+      color: #000;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+
+    /* Inspector Side Panel */
+    .detail-inspector {
+      background-color: var(--surface-low);
+      border-radius: 8px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      position: sticky;
+      top: 84px;
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .inspector-avatar-box {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background-color: var(--primary-container);
+      color: #ffffff;
+      font-family: var(--font-title);
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inspector-card-section {
+      background-color: var(--surface-card);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .section-eyebrow {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      font-weight: 700;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-main);
+    }
+
+    .vehicle-auth-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--surface-card);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .btn-full-primary {
+      width: 100%;
+      background-color: var(--primary);
+      color: var(--on-primary);
+      font-weight: 700;
+      justify-content: center;
+      padding: 12px;
+    }
+    .btn-full-primary:hover {
+      background-color: #34d399;
+    }
+
+    .btn-action-outline-danger {
+      width: 100%;
+      background-color: rgba(239, 68, 68, 0.12);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 6px;
+      padding: 9px;
+      font-family: var(--font-title);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .btn-action-outline-danger:hover {
+      background-color: #ef4444;
+      color: #ffffff;
+    }
+
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+<!-- LEFT SIDEBAR NAVIGATION -->
+<aside class="app-sidebar">
+<div>
+<div class="sidebar-header">
+<div class="brand-logo-row">
+<div class="brand-icon-box">
+<span class="material-symbols-outlined" style="font-size: 22px;">local_parking</span>
+</div>
+<div class="brand-titles">
+<span class="brand-name">Autos Colombia</span>
+<span class="brand-sub">Control Operativo</span>
+</div>
+</div>
+<div class="server-status-pill">
+<div class="status-indicator">
+<span class="pulse-dot-container">
+<span class="pulse-ring"></span>
+<span class="pulse-dot"></span>
+</span>
+<span style="text-transform: uppercase;">Servidor Central</span>
+</div>
+<span style="color: var(--primary); font-weight: 700; text-transform: uppercase;">En Línea</span>
+</div>
+</div>
+<nav class="nav-list">
+<a class="nav-link" href="#">
+<span class="material-symbols-outlined">sync_alt</span>
+<span>Control Entradas/Salidas</span>
+</a>
+<a class="nav-link" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span>Mapa de Celdas</span>
+</a>
+<a class="nav-link" href="#">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span>Caja y Pagos</span>
+</a>
+<a class="nav-link" href="#">
+<span class="material-symbols-outlined">report_problem</span>
+<span>Novedades y Daños</span>
+</a>
+<a class="nav-link active" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>Mensualidades</span>
+</a>
+</nav>
+</div>
+<div class="sidebar-footer">
+<div class="telemetry-row">
+<span>SISTEMA TELEMETRÍA</span>
+<span style="color: var(--primary); font-weight: bold;">v4.2.0</span>
+</div>
+<div class="sensor-ok">
+<span class="material-symbols-outlined" style="font-size: 15px; color: var(--primary);">verified</span>
+<span>ANPR / SENSOR LPR OK</span>
+</div>
+</div>
+</aside>
+<!-- MAIN VIEWPORT WRAPPER -->
+<div class="main-wrapper">
+<!-- TOP STICKY NAVBAR -->
+<header class="top-navbar">
+<div class="nav-stats-left">
+<div class="time-badge">
+<span class="material-symbols-outlined" style="color: var(--primary); font-size: 18px;">schedule</span>
+<span>14:28:42 BOGOTÁ (UTC-5)</span>
+</div>
+<div class="occupancy-widget">
+<div>
+<div style="display: flex; justify-content: space-between; gap: 14px; font-size: 11px; text-transform: uppercase;">
+<span style="color: var(--text-muted); font-weight: 600;">Ocupación</span>
+<span style="font-family: var(--font-mono); color: var(--primary); font-weight: 700;">142/200 Celdas (71%)</span>
+</div>
+<div class="occupancy-progress">
+<div class="occupancy-fill"></div>
+</div>
+</div>
+</div>
+<div class="rate-chip">
+<span class="material-symbols-outlined" style="font-size: 18px;">toll</span>
+<span>TARIFA FRACCIÓN $110 COP / MIN</span>
+</div>
+</div>
+<div class="nav-actions-right">
+<button class="btn-alert" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">warning</span>
+<span>Alerta Barricada</span>
+</button>
+<div class="user-profile-badge">
+<div style="text-align: right; display: flex; flex-direction: column;">
+<span style="font-size: 12.5px; font-weight: 600;">Juan Montalvo</span>
+<span style="font-family: var(--font-mono); font-size: 10px; color: var(--primary); text-transform: uppercase;">OPERADOR CABINA 1</span>
+</div>
+<div class="user-avatar-circle">
+<span class="material-symbols-outlined" style="font-size: 20px;">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN BODY CONTENT -->
+<main class="content-area">
+<!-- HEADER BANNER & ACTIONS -->
+<section class="header-banner">
+<div class="header-titles">
+<div class="header-main-row">
+<div class="header-icon-box">
+<span class="material-symbols-outlined" style="font-size: 20px;">badge</span>
+</div>
+<h1 class="header-title-text">Gestión de Mensualidades y Abonados VIP</h1>
+<span class="badge-pill-lpr">MÓDULO FACTURACIÓN LPR</span>
+</div>
+<p class="header-sub-text">Contratos Corporativos, Facturación Recurrente y Control de Accesos RFID / LPR en Tiempo Real</p>
+</div>
+<div class="header-buttons">
+<button class="btn btn-secondary-surface" type="button">
+<span class="material-symbols-outlined" style="color: var(--tertiary);">download</span>
+<span>Descargar Cartera</span>
+</button>
+<button class="btn btn-amber" type="button">
+<span class="material-symbols-outlined">payments</span>
+<span>Cobrar Renovación [F7]</span>
+</button>
+<button class="btn btn-primary-green" type="button">
+<span class="material-symbols-outlined">add_circle</span>
+<span>+ Nueva Mensualidad / Contrato</span>
+</button>
+</div>
+</section>
+<!-- KPI METRIC CARDS -->
+<section class="kpi-grid">
+<!-- KPI 1 -->
+<div class="kpi-card">
+<div>
+<div class="kpi-top-row">
+<span class="kpi-title">Abonados Activos</span>
+<span class="material-symbols-outlined" style="color: var(--primary);">how_to_reg</span>
+</div>
+<div class="kpi-number-row">
+<span class="kpi-value-big">84</span>
+<span style="font-family: var(--font-mono); color: var(--primary); font-size: 12px; font-weight: 700; text-transform: uppercase;">Contratos Vigentes</span>
+</div>
+</div>
+<div class="kpi-footer-row">
+<span>Flotas: 18 emp.</span>
+<span style="color: var(--primary); font-weight: 700;">94.2% Retención</span>
+</div>
+</div>
+<!-- KPI 2 -->
+<div class="kpi-card">
+<div>
+<div class="kpi-top-row">
+<span class="kpi-title">Cupos Reservados Asignados</span>
+<span class="material-symbols-outlined" style="color: var(--tertiary);">pin_drop</span>
+</div>
+<div class="kpi-number-row">
+<span class="kpi-value-big">42<span style="color: var(--text-muted); font-size: 20px; font-weight: 400;">/50</span></span>
+<span style="font-family: var(--font-mono); color: var(--tertiary); font-size: 12px; font-weight: 700; text-transform: uppercase;">84% Asignado</span>
+</div>
+</div>
+<div style="margin-top: 14px;">
+<div style="width: 100%; height: 6px; background-color: var(--surface-highest); border-radius: 9999px; overflow: hidden;">
+<div style="width: 84%; height: 100%; background-color: var(--tertiary-container); border-radius: 9999px;"></div>
+</div>
+<div class="kpi-footer-row" style="margin-top: 8px;">
+<span>8 celdas libres exclusivas</span>
+<span style="color: var(--tertiary);">Piso 1 &amp; 2</span>
+</div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="kpi-card">
+<div>
+<div class="kpi-top-row">
+<span class="kpi-title">Facturación Mensual Proyectada</span>
+<span class="material-symbols-outlined" style="color: var(--secondary);">receipt_long</span>
+</div>
+<div style="display: flex; flex-direction: column; margin-top: 4px;">
+<span class="kpi-value-big" style="color: var(--secondary); font-family: var(--font-mono); font-size: 26px;">$35,280,000</span>
+<span style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); text-transform: uppercase;">COP / Facturado Mes Corriente</span>
+</div>
+</div>
+<div class="kpi-footer-row">
+<span>Recaudado: 89%</span>
+<span style="color: var(--secondary); font-weight: 700;">$31.4M Cobrado</span>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="kpi-card">
+<div>
+<div class="kpi-top-row">
+<span class="kpi-title" style="color: var(--error);">Cartera Vencida / Por Renovar</span>
+<span class="material-symbols-outlined" style="color: var(--error);">notification_important</span>
+</div>
+<div class="kpi-number-row">
+<span class="kpi-value-big" style="color: var(--error);">6</span>
+<span style="font-family: var(--font-mono); color: var(--error); font-size: 12px; font-weight: 700; text-transform: uppercase;">Contratos en Alerta</span>
+</div>
+</div>
+<div class="kpi-footer-row">
+<div style="display: flex; align-items: center; gap: 6px;">
+<span style="width: 7px; height: 7px; border-radius: 50%; background-color: var(--error);"></span>
+<span style="color: var(--text-main);">Auto-notificados WhatsApp &amp; DIAN</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SEARCH BAR & CATEGORY FILTERS -->
+<section class="toolbar-container">
+<div class="search-input-wrapper">
+<span class="material-symbols-outlined search-icon">search</span>
+<input class="search-input" placeholder="Buscar por titular, Cédula / NIT, placa colombiana (ej: AAA-123), o bahía..." type="text"/>
+<span class="esc-tag">ESC PARA LIMPIAR</span>
+</div>
+<div class="filter-chips-list">
+<button class="filter-chip active" type="button">Todos (84)</button>
+<button class="filter-chip" type="button">
+<span class="dot-bullet" style="background-color: var(--primary);"></span>
+<span>Al Día (72)</span>
+</button>
+<button class="filter-chip" style="color: var(--secondary);" type="button">
+<span class="dot-bullet" style="background-color: var(--secondary);"></span>
+<span>Vence en 5D (6)</span>
+</button>
+<button class="filter-chip" style="color: var(--error);" type="button">
+<span class="dot-bullet" style="background-color: var(--error);"></span>
+<span>Vencidos (4)</span>
+</button>
+<button class="filter-chip" style="color: var(--tertiary);" type="button">
+<span class="material-symbols-outlined" style="font-size: 15px;">apartment</span>
+<span>Flotas (18)</span>
+</button>
+</div>
+</section>
+<!-- WORKBENCH 2-COLUMN VIEW (8 COLS CONTRACT LIST + 4 COLS DETAIL PANEL) -->
+<div class="workbench-grid">
+<!-- CONTRACTS LIST -->
+<div class="contracts-list">
+<!-- ITEM 1: CARLOS RESTREPO (AL DÍA) -->
+<article class="contract-card">
+<div class="card-row-top">
+<div class="contractor-info-group">
+<div class="colombia-plate">
+<span class="plate-code">WXY·782</span>
+<span class="plate-city">BOGOTÁ D.C.</span>
+</div>
+<div class="contractor-details">
+<div class="contractor-name-row">
+<span class="contractor-title">Carlos E. Restrepo</span>
+<span class="id-tag">C.C. 79.432.110</span>
+</div>
+<div class="plan-tag-row">
+<span style="color: var(--primary); display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 14px;">stars</span> Plan Oro 24/7
+                    </span>
+<span>•</span>
+<span style="color: var(--text-main);">Bahía A-14</span>
+<span>•</span>
+<span>Tag: #RF-88219</span>
+</div>
+</div>
+</div>
+<div class="tariff-status-block">
+<span class="status-badge status-active">Activo Al Día</span>
+<span class="tariff-amount" style="color: var(--text-main);">$420,000 <span class="tariff-unit">COP/m</span></span>
+</div>
+</div>
+<div class="card-row-bottom">
+<div class="expiry-meta">
+<span style="display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span>
+                  Vence: <strong style="color: var(--text-main); font-family: var(--font-mono);">28 Nov 2024</strong> (En 14 días)
+                </span>
+<span style="color: var(--primary); display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 15px;">videocam</span>
+                  LPR ANPR 99.8%
+                </span>
+</div>
+<div class="card-actions">
+<button class="btn-sm-action" type="button">
+<span class="material-symbols-outlined" style="font-size: 14px;">edit_calendar</span>
+                  Extender
+                </button>
+<button class="btn-sm-action" type="button">
+<span class="material-symbols-outlined" style="font-size: 14px;">receipt</span>
+                  Recibo
+                </button>
+</div>
+</div>
+</article>
+<!-- ITEM 2: BANCOLOMBIA (VENCE EN 3 DÍAS) -->
+<article class="contract-card">
+<div class="card-row-top">
+<div class="contractor-info-group" style="align-items: flex-start;">
+<div style="width: 44px; height: 44px; border-radius: 6px; background-color: var(--secondary-amber); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+<span class="material-symbols-outlined" style="font-size: 24px;">corporate_fare</span>
+</div>
+<div class="contractor-details">
+<div class="contractor-name-row">
+<span class="contractor-title">Inversiones Bancolombia S.A.</span>
+<span class="id-tag">NIT 890.903.938-1</span>
+<span style="background-color: rgba(76, 215, 246, 0.15); color: var(--tertiary); font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; border-radius: 4px;">Flota Ejecutiva 5 Carros</span>
+</div>
+<div style="font-size: 12.5px; color: var(--text-sub);">
+                    Plan Corporativo Diurno (6:00 am - 8:00 pm) • Celdas B01 a B05
+                  </div>
+<!-- PLATES CLUSTER -->
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px;">
+<span class="plate-badge-sm">KRM·930</span>
+<span class="plate-badge-sm">NK0·419</span>
+<span class="plate-badge-sm">LRP·102</span>
+<span class="plate-badge-sm">BTM·551</span>
+<span class="plate-badge-sm">FGR·889</span>
+</div>
+</div>
+</div>
+<div class="tariff-status-block">
+<span class="status-badge status-warning">Vence en 3 Días</span>
+<span class="tariff-amount" style="color: var(--secondary);">$1,850,000 <span class="tariff-unit">COP/m</span></span>
+</div>
+</div>
+<div class="card-row-bottom">
+<div style="color: var(--secondary); display: flex; align-items: center; gap: 6px; font-family: var(--font-mono);">
+<span class="material-symbols-outlined" style="font-size: 16px;">hourglass_bottom</span>
+<span>Vencimiento: <strong>17 Nov 2024</strong> (Cobro en trámite)</span>
+</div>
+<div class="card-actions">
+<button class="btn btn-amber" style="padding: 5px 12px; font-size: 11px;" type="button">
+<span class="material-symbols-outlined" style="font-size: 15px;">receipt_long</span>
+                  Generar Factura Electrónica
+                </button>
+</div>
+</div>
+</article>
+<!-- ITEM 3: DRA MARIANA SALAZAR (MORA 2 DÍAS) -->
+<article class="contract-card">
+<div class="card-row-top">
+<div class="contractor-info-group">
+<div class="colombia-plate">
+<div style="display: flex; align-items: center; gap: 2px;">
+<span class="material-symbols-outlined" style="font-size: 12px; color: #000;">bolt</span>
+<span class="plate-code">BYD·802</span>
+</div>
+<span class="plate-city">MEDELLÍN</span>
+</div>
+<div class="contractor-details">
+<div class="contractor-name-row">
+<span class="contractor-title">Dra. Mariana Salazar</span>
+<span class="id-tag">C.C. 52.889.301</span>
+</div>
+<div class="plan-tag-row">
+<span style="color: var(--tertiary); display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 14px;">electric_car</span> Plan Verde EV + Carga
+                    </span>
+<span>•</span>
+<span style="color: var(--text-main);">Bahía A-04 (Cargador 7.4 kW)</span>
+</div>
+</div>
+</div>
+<div class="tariff-status-block">
+<span class="status-badge status-danger">
+<span class="material-symbols-outlined" style="font-size: 13px;">lock</span> Mora (2 Días)
+                </span>
+<span class="tariff-amount" style="color: var(--error);">$560,000 <span class="tariff-unit">COP/m</span></span>
+</div>
+</div>
+<div class="alert-banner-mora">
+<div style="color: var(--error); display: flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 12.5px;">
+<span class="material-symbols-outlined" style="font-size: 16px;">block</span>
+<span>Acceso Automático Bloqueado en Talanquera. Venció: <strong>12 Nov 2024</strong></span>
+</div>
+<button class="btn" style="background-color: #ef4444; color: #fff; padding: 5px 12px; font-size: 11px;" type="button">
+<span class="material-symbols-outlined" style="font-size: 14px;">point_of_sale</span>
+                Recibir Pago &amp; Desbloquear
+              </button>
+</div>
+</article>
+<!-- ITEM 4: ANDRES GOMEZ (MOTO ACTIVO) -->
+<article class="contract-card">
+<div class="card-row-top">
+<div class="contractor-info-group">
+<div class="colombia-plate" style="width: 95px; min-width: 95px;">
+<span class="plate-code">DRX·44F</span>
+<span class="plate-city">COLOMBIA</span>
+</div>
+<div class="contractor-details">
+<div class="contractor-name-row">
+<span class="contractor-title">Andrés Felipe Gómez</span>
+<span class="id-tag">C.C. 1.018.452.990</span>
+</div>
+<div class="plan-tag-row">
+<span style="color: var(--primary); display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 14px;">two_wheeler</span> Plan Moto Mensual
+                    </span>
+<span>•</span>
+<span style="color: var(--text-main);">Bahía M-12 (Pabellón Motos)</span>
+</div>
+</div>
+</div>
+<div class="tariff-status-block">
+<span class="status-badge status-active">Activo Al Día</span>
+<span class="tariff-amount" style="color: var(--text-main);">$140,000 <span class="tariff-unit">COP/m</span></span>
+</div>
+</div>
+<div class="card-row-bottom">
+<div class="expiry-meta">
+<span style="display: flex; align-items: center; gap: 4px;">
+<span class="material-symbols-outlined" style="font-size: 16px;">event_available</span>
+                  Vence: <strong style="color: var(--text-main); font-family: var(--font-mono);">05 Dic 2024</strong> (En 21 días)
+                </span>
+</div>
+<div class="card-actions">
+<button class="btn-sm-action" type="button">
+<span class="material-symbols-outlined" style="font-size: 14px;">qr_code_2</span>
+                  Tag Digital
+                </button>
+<button class="btn-sm-action" type="button">
+<span class="material-symbols-outlined" style="font-size: 14px;">edit</span>
+                  Gestionar
+                </button>
+</div>
+</div>
+</article>
+</div>
+<!-- RIGHT DETAIL / INSPECTOR PANEL -->
+<aside class="detail-inspector">
+<!-- ABONADO IDENTITY -->
+<div class="inspector-header">
+<div style="display: flex; align-items: center; gap: 14px;">
+<div class="inspector-avatar-box">CR</div>
+<div>
+<div style="display: flex; align-items: center; gap: 6px;">
+<h2 style="font-family: var(--font-title); font-size: 16px; font-weight: 700; color: var(--text-main);">Carlos E. Restrepo</h2>
+<span class="material-symbols-outlined" style="color: var(--primary); font-size: 18px;">verified</span>
+</div>
+<div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 2px;">Cédula: 79.432.110 (Bogotá)</div>
+<div style="font-family: var(--font-mono); font-size: 11.5px; color: var(--primary); font-weight: 700; text-transform: uppercase; margin-top: 3px;">ABONADO VIP #AB-2041</div>
+</div>
+</div>
+<button style="background: none; border: none; color: var(--text-muted); cursor: pointer;" type="button">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- CONTACT INFO -->
+<div class="inspector-card-section">
+<span class="section-eyebrow">Contacto &amp; Notificaciones</span>
+<div class="contact-row" style="margin-top: 4px;">
+<span class="material-symbols-outlined" style="color: var(--tertiary); font-size: 16px;">call</span>
+<span style="font-family: var(--font-mono);">+57 311 482 9901</span>
+</div>
+<div class="contact-row">
+<span class="material-symbols-outlined" style="color: var(--tertiary); font-size: 16px;">mail</span>
+<span>carlos.restrepo@andesmining.co</span>
+</div>
+<div class="contact-row">
+<span class="material-symbols-outlined" style="color: var(--tertiary); font-size: 16px;">home_pin</span>
+<span style="color: var(--text-sub);">Cra 7 # 114 - 32 Of. 801, Bogotá</span>
+</div>
+</div>
+<!-- AUTHORIZED VEHICLES -->
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<span class="section-eyebrow">Vehículos Autorizados (2)</span>
+<button style="background: none; border: none; color: var(--primary); font-family: var(--font-mono); font-size: 11px; font-weight: 700; text-transform: uppercase; cursor: pointer;" type="button">+ Asociar</button>
+</div>
+<!-- VEHICLE 1 -->
+<div class="vehicle-auth-item">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="colombia-plate" style="width: 82px; min-width: 82px; padding: 2px 4px;">
+<span class="plate-code" style="font-size: 13px;">WXY·782</span>
+<span class="plate-city" style="font-size: 6px;">BOGOTÁ D.C.</span>
+</div>
+<div>
+<div style="font-weight: 600; font-size: 13px;">BMW X3 M40i (2023)</div>
+<div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Tag RFID: #RF-88219</div>
+</div>
+</div>
+<span class="material-symbols-outlined" style="color: var(--primary); font-size: 20px;">check_circle</span>
+</div>
+<!-- VEHICLE 2 -->
+<div class="vehicle-auth-item">
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="colombia-plate" style="width: 82px; min-width: 82px; padding: 2px 4px;">
+<span class="plate-code" style="font-size: 13px;">FHL·412</span>
+<span class="plate-city" style="font-size: 6px;">CHÍA</span>
+</div>
+<div>
+<div style="font-weight: 600; font-size: 13px;">Toyota Prado TXL</div>
+<div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-muted);">Solo reemplazo autorizado</div>
+</div>
+</div>
+<span class="material-symbols-outlined" style="color: var(--text-muted); font-size: 20px;">toggle_off</span>
+</div>
+</div>
+<!-- TELEMETRY ACCESS LOGS -->
+<div class="inspector-card-section">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<span class="section-eyebrow">Actividad de Acceso (Mes)</span>
+<span style="font-family: var(--font-mono); font-size: 11.5px; color: var(--primary); font-weight: 700;">48 Accesos LPR</span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-top: 4px;">
+<span style="color: var(--text-sub);">Último Ingreso:</span>
+<span style="font-family: var(--font-mono); font-weight: 600;">Hoy 07:44 AM (Carril 1)</span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12.5px;">
+<span style="color: var(--text-sub);">Tasa de ocupación celda A-14:</span>
+<span style="font-family: var(--font-mono); color: var(--tertiary); font-weight: 600;">68% del tiempo</span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12.5px;">
+<span style="color: var(--text-sub);">Cámara LPR Confianza:</span>
+<span style="font-family: var(--font-mono); color: var(--primary); font-weight: 600;">99.8% (Óptimo)</span>
+</div>
+</div>
+<!-- ACTION BUTTONS -->
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<button class="btn btn-full-primary" type="button">
+<span class="material-symbols-outlined" style="font-size: 18px;">currency_exchange</span>
+<span>Renovar Mensualidad (Recibir Pago)</span>
+</button>
+<div class="grid-2col">
+<button class="btn-sm-action" style="justify-content: center; padding: 8px;" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">swap_horiz</span>
+                Reasignar Celda
+              </button>
+<button class="btn-sm-action" style="justify-content: center; padding: 8px;" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">receipt</span>
+                Datos DIAN
+              </button>
+</div>
+<button class="btn-action-outline-danger" type="button">
+<span class="material-symbols-outlined" style="font-size: 16px;">gavel</span>
+<span>Suspender Acceso en Talanquera</span>
+</button>
+</div>
+</aside>
+</div>
+</main>
+</div>
+</body></html>

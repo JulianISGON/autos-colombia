@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Autos Colombia - Caja y Pagos</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    /* RESET & CORE VARIABLES */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0b1326;
+      --card-bg: #131b2e;
+      --card-bg-subtle: #171f33;
+      --card-bg-high: #222a3d;
+      --surface-lowest: #060e20;
+      --text-main: #dae2fd;
+      --text-muted: #86948a;
+      --text-subtle: #bbcabf;
+      --border-color: #222a3d;
+      --border-subtle: #1f273b;
+      
+      --primary: #10b981;
+      --primary-light: #4edea3;
+      --primary-dark: #003824;
+      --primary-dim: rgba(16, 185, 129, 0.15);
+      
+      --secondary: #f59e0b;
+      --secondary-dim: rgba(245, 158, 11, 0.15);
+      
+      --tertiary: #4cd7f6;
+      --tertiary-dim: rgba(76, 215, 246, 0.15);
+
+      --error: #ef4444;
+      --error-container: #93000a;
+      --error-dim: rgba(239, 68, 68, 0.15);
+
+      --plate-yellow: #facc15;
+      --plate-border: #000000;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      line-height: 1.45;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--surface-lowest);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--card-bg-high);
+      border-radius: 3px;
+    }
+
+    /* TYPOGRAPHY UTILS */
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .font-heading {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 270px;
+      background-color: var(--card-bg);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 50;
+    }
+    .sidebar-header {
+      padding: 20px 18px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      color: #002113;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .brand-text-main {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--text-main);
+      line-height: 1.1;
+    }
+    .brand-text-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--primary-light);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .server-status-pill {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .status-dot-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-subtle);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--primary-light);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary-light);
+    }
+    .nav-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px 12px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      color: var(--text-subtle);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+    .nav-item:hover {
+      background-color: var(--card-bg-high);
+      color: var(--text-main);
+    }
+    .nav-item.active {
+      background-color: var(--primary);
+      color: #002e1b;
+      font-weight: 700;
+    }
+    .sidebar-footer {
+      padding: 16px;
+      background: var(--card-bg-subtle);
+      border-top: 1px solid var(--border-subtle);
+    }
+    .footer-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .lpr-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-subtle);
+    }
+
+    /* TOP HEADER */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 270px;
+      right: 0;
+      height: 64px;
+      background: rgba(11, 19, 38, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 40;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .badge-card {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 6px 12px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .occupancy-meter {
+      width: 110px;
+      height: 6px;
+      background: var(--card-bg-high);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 3px;
+    }
+    .occupancy-fill {
+      width: 71%;
+      height: 100%;
+      background: var(--primary);
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-alert {
+      background: var(--error-container);
+      color: #ffdad6;
+      border: 1px solid var(--error);
+      padding: 6px 14px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+    }
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 5px 12px;
+      border-radius: 4px;
+    }
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #002a18;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* MAIN CONTENT WRAPPER */
+    .main-wrap {
+      margin-left: 270px;
+      padding-top: 64px;
+      min-height: 100vh;
+      background: var(--bg);
+    }
+    .content-container {
+      padding: 22px 26px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* MODULE HEADER CARD */
+    .module-header {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .tag-terminal {
+      background: var(--primary-dim);
+      color: var(--primary-light);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+    }
+    .module-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-main);
+      margin: 4px 0;
+    }
+    .meta-subtitle {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      flex-wrap: wrap;
+    }
+    .action-button-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-neutral {
+      background: var(--card-bg-high);
+      color: var(--text-main);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .btn-neutral:hover {
+      background: #2c364e;
+    }
+    .btn-emerald {
+      background: var(--primary);
+      color: #002919;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .btn-emerald:hover {
+      background: var(--primary-light);
+    }
+
+    /* KPI METRICS ROW */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+    @media (max-width: 1200px) {
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 104px;
+    }
+    .kpi-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .kpi-amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin: 4px 0 2px;
+      line-height: 1.1;
+    }
+    .progress-bar-thin {
+      height: 4px;
+      background: var(--card-bg-high);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    /* TWO COLUMN LAYOUT */
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 7fr 5fr;
+      gap: 20px;
+    }
+    @media (max-width: 1100px) {
+      .two-col-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* LEFT COLUMN: LIQUIDACIÓN */
+    .col-left, .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 18px;
+    }
+
+    /* BARCODE & SEARCH BOX */
+    .search-input-group {
+      display: flex;
+      gap: 10px;
+      margin: 12px 0 10px;
+    }
+    .input-plate-search {
+      flex: 1;
+      background: var(--surface-lowest);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      outline: none;
+    }
+    .input-plate-search:focus {
+      border-color: var(--primary);
+    }
+    .btn-search {
+      background: var(--primary);
+      color: #002a18;
+      border: none;
+      border-radius: 4px;
+      padding: 0 18px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .queue-chips-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      font-size: 11.5px;
+      padding-top: 4px;
+    }
+    .chip {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 4px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+      cursor: pointer;
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .chip.active {
+      border-color: var(--secondary);
+      background: rgba(245, 158, 11, 0.1);
+    }
+
+    /* LIVE VEHICLE TICKET DISPLAY */
+    .vehicle-hero-card {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .vehicle-info-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    /* COLOMBIAN LICENSE PLATE */
+    .plate-co {
+      background-color: var(--plate-yellow);
+      color: #000;
+      border: 2px solid #000;
+      border-radius: 5px;
+      width: 154px;
+      height: 68px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      user-select: none;
+      line-height: 1;
+    }
+    .plate-co .plate-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .plate-co .plate-city {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      margin-top: 2px;
+    }
+
+    .plate-co-sm {
+      background-color: var(--plate-yellow);
+      color: #000;
+      border: 1.5px solid #000;
+      border-radius: 4px;
+      width: 82px;
+      height: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .plate-co-sm .plate-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .plate-co-sm .plate-city {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 6.5px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    /* TIMINGS GRID */
+    .timings-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      background: var(--surface-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+    @media (max-width: 600px) {
+      .timings-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .timing-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .timing-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .timing-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 700;
+    }
+
+    /* LIQUIDATION BREAKDOWN TABLE */
+    .breakdown-box {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      margin-bottom: 16px;
+    }
+    .breakdown-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13.5px;
+    }
+    .breakdown-line.highlight {
+      background: var(--secondary-dim);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      padding: 7px 10px;
+      border-radius: 4px;
+      color: var(--secondary);
+    }
+    .breakdown-divider {
+      height: 1px;
+      background: var(--card-bg-high);
+      margin: 4px 0;
+    }
+    .total-line {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding-top: 4px;
+    }
+    .total-amount {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px;
+      font-weight: 700;
+      color: var(--primary-light);
+      line-height: 1;
+    }
+
+    /* PAYMENT METHODS SELECTOR */
+    .payment-methods-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 10px 0 16px;
+    }
+    @media (max-width: 600px) {
+      .payment-methods-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .pay-btn {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-subtle);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pay-btn:hover {
+      background: var(--card-bg-high);
+      color: var(--text-main);
+    }
+    .pay-btn.selected {
+      background: #202b45;
+      border-color: var(--primary-light);
+      color: var(--text-main);
+      box-shadow: 0 0 0 1px var(--primary-light);
+    }
+    .pay-btn-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .pay-btn-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    /* CASH CALCULATOR */
+    .cash-calc-box {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .cash-presets-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .preset-pills {
+      display: flex;
+      gap: 6px;
+    }
+    .preset-pill {
+      background: var(--card-bg-high);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .preset-pill:hover {
+      background: #2a354d;
+    }
+    .input-cash-received {
+      background: var(--surface-lowest);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: right;
+      padding: 5px 10px;
+      border-radius: 4px;
+      width: 120px;
+      outline: none;
+    }
+    .change-banner {
+      background: var(--surface-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* DIAN CHECKBOX */
+    .dian-row {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .dian-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* BIG F4 ACTION BUTTON */
+    .btn-charge-master {
+      width: 100%;
+      background: var(--primary);
+      color: #002e1b;
+      border: none;
+      border-radius: 6px;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.3);
+      cursor: pointer;
+      transition: transform 0.1s ease, background 0.15s ease;
+    }
+    .btn-charge-master:hover {
+      background: var(--primary-light);
+    }
+    .btn-charge-master:active {
+      transform: translateY(1px);
+    }
+    .btn-charge-inner-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+    .charge-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .charge-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      opacity: 0.85;
+      letter-spacing: 0.04em;
+    }
+    .barrier-pill {
+      background: rgba(0, 46, 27, 0.2);
+      border: 1px solid rgba(0, 46, 27, 0.3);
+      padding: 8px 14px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    /* RIGHT COLUMN: CASH ARQUEO & TX AUDIT */
+    .arqueo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+    @media (max-width: 600px) {
+      .arqueo-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .arqueo-cell {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .arqueo-cell-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+    .arqueo-cell-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .arqueo-total-bar {
+      background: var(--card-bg-high);
+      border-radius: 4px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* TRANSACTION AUDIT LIST */
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+    .filter-btn {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 10.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .filter-btn.active {
+      background: var(--primary);
+      color: #002e1b;
+      border-color: var(--primary);
+    }
+    .tx-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+    .tx-item {
+      background: var(--card-bg-subtle);
+      border: 1px solid var(--border-subtle);
+      border-radius: 5px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+    .tx-item:hover {
+      background: var(--card-bg-high);
+    }
+    .tx-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tx-car-col {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tx-foot-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+      padding-top: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+    .audit-footer-bar {
+      margin-top: 14px;
+      background: var(--surface-lowest);
+      border: 1px solid var(--border-subtle);
+      border-radius: 4px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+<!-- LEFT NAVIGATION SIDEBAR -->
+<aside class="sidebar">
+<div>
+<div class="sidebar-header">
+<div class="brand-row">
+<div class="brand-icon">
+<span class="material-symbols-outlined" style="font-size:22px;">local_parking</span>
+</div>
+<div>
+<div class="brand-text-main">Autos Colombia</div>
+<div class="brand-text-sub">Control Operativo</div>
+</div>
+</div>
+<div class="server-status-pill">
+<div class="status-dot-wrap">
+<span class="status-dot"></span>
+<span>SERVIDOR CENTRAL</span>
+</div>
+<span style="color:var(--primary-light); font-weight:700;">EN LÍNEA</span>
+</div>
+</div>
+<nav class="nav-list">
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size:20px;">sync_alt</span>
+<span>Control Entradas/Salidas</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size:20px;">grid_view</span>
+<span>Mapa de Celdas</span>
+</a>
+<a class="nav-item active" href="#">
+<span class="material-symbols-outlined" style="font-size:20px;">point_of_sale</span>
+<span>Caja y Pagos</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size:20px;">report_problem</span>
+<span>Novedades y Daños</span>
+</a>
+<a class="nav-item" href="#">
+<span class="material-symbols-outlined" style="font-size:20px;">badge</span>
+<span>Mensualidades</span>
+</a>
+</nav>
+</div>
+<div class="sidebar-footer">
+<div class="footer-meta">
+<span>SISTEMA TELEMETRÍA</span>
+<span style="color:var(--primary-light);">v4.2.0</span>
+</div>
+<div class="lpr-status">
+<span class="material-symbols-outlined" style="font-size:15px; color:var(--primary-light);">verified</span>
+<span>ANPR / SENSOR LPR OK</span>
+</div>
+</div>
+</aside>
+<!-- TOP HEADER -->
+<header class="topbar">
+<div class="header-left">
+<div class="badge-card">
+<span class="material-symbols-outlined" style="color:var(--primary-light); font-size:18px;">schedule</span>
+<span class="font-mono" style="font-size:12px; font-weight:600;">14:28:42 BOGOTÁ (UTC-5)</span>
+</div>
+<div class="badge-card" style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;">
+<div style="display:flex; justify-content:space-between; width:100%; gap:14px; font-size:11px;">
+<span style="color:var(--text-muted); text-transform:uppercase;">Ocupación</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700;">142/200 Celdas (71%)</span>
+</div>
+<div class="occupancy-meter">
+<div class="occupancy-fill"></div>
+</div>
+</div>
+<div class="badge-card">
+<span class="material-symbols-outlined" style="color:var(--secondary); font-size:18px;">toll</span>
+<span class="font-mono" style="color:var(--secondary); font-size:11.5px; font-weight:700;">TARIFA FRACCIÓN $110 COP / MIN</span>
+</div>
+</div>
+<div class="header-right">
+<button class="btn-alert" type="button">
+<span class="material-symbols-outlined" style="font-size:16px;">warning</span>
+<span>Alerta Barricada</span>
+</button>
+<div class="user-profile">
+<div style="text-align:right;">
+<div style="font-weight:600; font-size:12.5px;">Juan Montalvo</div>
+<div class="font-mono" style="color:var(--primary-light); font-size:10px;">OPERADOR CABINA 1</div>
+</div>
+<div class="avatar-circle">
+<span class="material-symbols-outlined" style="font-size:19px;">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN BODY -->
+<main class="main-wrap">
+<div class="content-container">
+<!-- HEADER DE MÓDULO -->
+<div class="module-header">
+<div>
+<div style="display:flex; align-items:center; gap:8px;">
+<span class="tag-terminal">POS TERMINAL #01</span>
+</div>
+<h1 class="module-title">Módulo de Caja y Liquidación — Turno 1</h1>
+<div class="meta-subtitle">
+<span style="display:flex; align-items:center; gap:4px;">
+<span class="material-symbols-outlined" style="font-size:16px; color:var(--primary-light);">storefront</span>
+              Garita Principal Entrada/Salida Calle 72
+            </span>
+<span>•</span>
+<span style="display:flex; align-items:center; gap:4px;">
+<span class="material-symbols-outlined" style="font-size:16px; color:var(--tertiary);">badge</span>
+              Operador: <strong style="color:var(--text-main);">Juan Montalvo (CC 1.019.284.112)</strong>
+</span>
+<span>•</span>
+<span class="font-mono" style="color:var(--secondary); display:flex; align-items:center; gap:4px;">
+<span class="material-symbols-outlined" style="font-size:16px;">event</span>
+              Apertura: Hoy, 06:00:00 COT
+            </span>
+</div>
+</div>
+<div class="action-button-group">
+<button class="btn-neutral" type="button">
+<span class="material-symbols-outlined" style="font-size:17px; color:var(--tertiary);">query_stats</span>
+<span>Arqueo Parcial</span>
+</button>
+<button class="btn-neutral" type="button">
+<span class="material-symbols-outlined" style="font-size:17px; color:var(--secondary);">assignment_turned_in</span>
+<span>Corte Z / Cierre Turno</span>
+</button>
+<button class="btn-emerald" onclick="alert('Abriendo cajón de dinero (Pulso RJ11 enviado)...')" type="button">
+<span class="material-symbols-outlined" style="font-size:18px;">lock_open</span>
+<span>Apertura Cajón [F8]</span>
+</button>
+</div>
+</div>
+<!-- ROW DE KPIS -->
+<div class="kpi-row">
+<!-- KPI 1 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Recaudo Total Turno</span>
+<span class="material-symbols-outlined" style="color:var(--primary-light); font-size:20px;">account_balance_wallet</span>
+</div>
+<div>
+<div class="kpi-amount" style="color:#fff;">$1,485,000</div>
+<div class="font-mono" style="color:var(--primary-light); font-size:11px; display:flex; align-items:center; gap:4px;">
+<span class="material-symbols-outlined" style="font-size:14px;">trending_up</span>
+<span>+18.4% vs prom. turno</span>
+</div>
+</div>
+<div style="font-size:11.5px; color:var(--text-muted);">100% de operaciones registradas</div>
+</div>
+<!-- KPI 2 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Efectivo en Caja</span>
+<span class="material-symbols-outlined" style="color:var(--secondary); font-size:20px;">payments</span>
+</div>
+<div>
+<div class="kpi-amount" style="color:var(--secondary);">$820,000</div>
+<div class="font-mono" style="color:var(--text-muted); font-size:11px;">
+              Fondo: $200k | Ventas: $620k
+            </div>
+</div>
+<div class="progress-bar-thin">
+<div style="width:55.2%; height:100%; background:var(--secondary);"></div>
+</div>
+</div>
+<!-- KPI 3 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Digital &amp; Datáfono</span>
+<span class="material-symbols-outlined" style="color:var(--tertiary); font-size:20px;">contactless</span>
+</div>
+<div>
+<div class="kpi-amount" style="color:var(--tertiary);">$665,000</div>
+<div class="font-mono" style="color:var(--text-muted); font-size:11px;">
+              QR: $280k | Redeban: $385k
+            </div>
+</div>
+<div class="progress-bar-thin">
+<div style="width:44.8%; height:100%; background:var(--tertiary);"></div>
+</div>
+</div>
+<!-- KPI 4 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Tickets Liquidados</span>
+<span class="material-symbols-outlined" style="color:var(--primary-light); font-size:20px;">receipt_long</span>
+</div>
+<div>
+<div class="kpi-amount" style="color:#fff;">186 <span style="font-size:14px; font-weight:400; color:var(--text-muted);">tx</span></div>
+<div class="font-mono" style="color:var(--text-muted); font-size:11px;">Ticket Prom: $7,983 COP</div>
+</div>
+<div style="font-size:11.5px; color:var(--primary-light); display:flex; align-items:center; gap:4px;">
+<span class="material-symbols-outlined" style="font-size:14px;">timer</span>
+<span>Ritmo: 31 veh/hora</span>
+</div>
+</div>
+<!-- KPI 5 -->
+<div class="kpi-card">
+<div class="kpi-header">
+<span>Pendientes Pista</span>
+<span class="material-symbols-outlined" style="color:var(--error); font-size:20px;">directions_car</span>
+</div>
+<div>
+<div class="kpi-amount" style="color:#fff;">14 <span style="font-size:14px; font-weight:400; color:var(--error);">en cola</span></div>
+<div class="font-mono" style="color:var(--secondary); font-size:11px;">Tiempo espera: ~1.8 min</div>
+</div>
+<div style="font-size:11.5px; color:var(--text-muted);">Garita Salida 1 y 2 activas</div>
+</div>
+</div>
+<!-- MAIN TWO COLUMN GRID -->
+<div class="two-col-grid">
+<!-- LEFT COLUMN: CHECKOUT & LIQUIDATION -->
+<div class="col-left">
+<!-- Búsqueda & Escáner Express -->
+<div class="card">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span class="font-heading" style="font-size:15px; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+<span class="material-symbols-outlined" style="color:var(--primary-light); font-size:19px;">qr_code_scanner</span>
+                Búsqueda y Lectura Express [Escáner / Teclado]
+              </span>
+<span class="font-mono" style="background:var(--card-bg-subtle); padding:2px 8px; border-radius:3px; font-size:10px; color:var(--text-muted);">
+                LPR ANPR VINCULADO
+              </span>
+</div>
+<div class="search-input-group">
+<input class="input-plate-search" placeholder="Ingrese Ticket # o Placa..." type="text" value="KLU-304"/>
+<button class="btn-search" type="button">
+<span class="material-symbols-outlined" style="font-size:17px;">search</span>
+<span>Buscar [Enter]</span>
+</button>
+</div>
+<div class="queue-chips-row">
+<span class="font-mono" style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">En Barrera Ahora:</span>
+<div class="chip active">
+<span style="color:var(--secondary); font-weight:700;">● KLU-304</span> (Garita Salida 1)
+              </div>
+<div class="chip">
+<strong>QHY-582</strong> (Garita Salida 2)
+              </div>
+<div class="chip">
+<strong>FXZ-119</strong> (Esperando Ticket)
+              </div>
+</div>
+</div>
+<!-- FICHA DE LIQUIDACIÓN EN VIVO -->
+<div class="card">
+<!-- Encabezado Vehículo y Placa -->
+<div class="vehicle-hero-card">
+<div class="vehicle-info-left">
+<!-- Placa Colombiana Oficial -->
+<div class="plate-co">
+<span class="plate-num">KLU·304</span>
+<span class="plate-city">MEDELLÍN</span>
+</div>
+<div>
+<h3 class="font-heading" style="font-size:17px; font-weight:700;">Mazda CX-30 Grand Touring</h3>
+<div style="font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:4px; margin:2px 0;">
+<span class="material-symbols-outlined" style="font-size:14px; color:var(--error);">palette</span>
+                    Color: Rojo Velvet Metalizado | Particular
+                  </div>
+<div style="display:flex; gap:6px; margin-top:4px;">
+<span class="font-mono" style="background:var(--primary-dim); color:var(--primary-light); font-size:10px; padding:2px 6px; border-radius:3px; font-weight:700;">ANPR CONF: 99.4%</span>
+<span class="font-mono" style="background:var(--card-bg-high); color:var(--text-subtle); font-size:10px; padding:2px 6px; border-radius:3px;">CELDA B-24</span>
+</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-mono" style="font-size:11px; color:var(--text-muted);">TICKET #TK-2024-89301</div>
+<div class="font-heading" style="color:var(--secondary); font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:flex-end; gap:4px; margin:2px 0;">
+<span class="material-symbols-outlined" style="font-size:16px;">pending</span>
+                  Liquidación Activa
+                </div>
+<div class="font-mono" style="font-size:10.5px; color:var(--text-muted);">Sensor loop: Ocupado</div>
+</div>
+</div>
+<!-- Tiempos de Estancia -->
+<div class="timings-grid">
+<div class="timing-item">
+<span class="timing-label">Hora de Entrada</span>
+<span class="timing-val" style="color:#fff;">08:15:22 AM</span>
+<span style="font-size:10.5px; color:var(--text-muted);">Cámara Entrada 01</span>
+</div>
+<div class="timing-item">
+<span class="timing-label">Hora de Liquidación</span>
+<span class="timing-val" style="color:var(--tertiary);">11:42:50 AM</span>
+<span style="font-size:10.5px; color:var(--text-muted);">Garita 01 (Cajero Actual)</span>
+</div>
+<div class="timing-item">
+<span class="timing-label">Tiempo Facturable</span>
+<span class="timing-val" style="color:var(--primary-light);">3h 27m (207 min)</span>
+<span style="font-size:10.5px; color:var(--primary-light);">Tolerancia salida: 15 min</span>
+</div>
+</div>
+<!-- Desglose Tarifario con Convenio y DIAN -->
+<div class="breakdown-box">
+<div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.04em;">
+                Liquidación Detallada Según Resolución
+              </div>
+<div class="breakdown-line">
+<span>Fracción Regular Minuto (207 min x $110 COP)</span>
+<span class="font-mono">$22,770 COP</span>
+</div>
+<div class="breakdown-line highlight">
+<span style="display:flex; align-items:center; gap:6px;">
+<span class="material-symbols-outlined" style="font-size:16px;">verified</span>
+<span>Convenio Comercial Centro Andino (-20% Sello Almacén Éxito)</span>
+</span>
+<span class="font-mono" style="font-weight:700;">-$4,554 COP</span>
+</div>
+<div class="breakdown-line" style="font-size:12.5px; color:var(--text-muted);">
+<span>Subtotal Liquidado</span>
+<span class="font-mono">$18,216 COP</span>
+</div>
+<div class="breakdown-line" style="font-size:12.5px; color:var(--text-muted);">
+<span>Ajuste de Redondeo Moneda Legal (DIAN Art. 868-ET)</span>
+<span class="font-mono">-$16 COP</span>
+</div>
+<div class="breakdown-divider"></div>
+<div class="total-line">
+<div>
+<div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em;">Total a Recaudar</div>
+<div style="font-size:11px; color:var(--primary-light);">IVA 19% Incluido ($2,906 COP)</div>
+</div>
+<div style="text-align:right;">
+<span class="total-amount">$18,200</span>
+<span class="font-mono" style="font-size:15px; color:var(--primary-light); font-weight:600;">COP</span>
+</div>
+</div>
+</div>
+<!-- MÉTODOS DE PAGO -->
+<div style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--text-muted); letter-spacing:0.05em;">
+              Seleccionar Medio de Pago [Teclas 1 al 4]
+            </div>
+<div class="payment-methods-grid">
+<button class="pay-btn selected" type="button">
+<span class="material-symbols-outlined" style="font-size:24px; color:var(--primary-light);">payments</span>
+<span class="pay-btn-title">1. Efectivo</span>
+<span class="pay-btn-sub" style="color:var(--primary-light); font-weight:700;">[ACTIVO]</span>
+</button>
+<button class="pay-btn" type="button">
+<span class="material-symbols-outlined" style="font-size:24px; color:var(--tertiary);">credit_card</span>
+<span class="pay-btn-title">2. Datáfono</span>
+<span class="pay-btn-sub">Redeban / Credi</span>
+</button>
+<button class="pay-btn" type="button">
+<span class="material-symbols-outlined" style="font-size:24px; color:var(--secondary);">qr_code_2</span>
+<span class="pay-btn-title">3. QR Nequi/Davi</span>
+<span class="pay-btn-sub">TransfiYa</span>
+</button>
+<button class="pay-btn" type="button">
+<span class="material-symbols-outlined" style="font-size:24px;">account_balance</span>
+<span class="pay-btn-title">4. Bancolombia</span>
+<span class="pay-btn-sub">Corresponsal</span>
+</button>
+</div>
+<!-- CALCULADORA RÁPIDA DE CAMBIO -->
+<div class="cash-calc-box">
+<div class="cash-presets-row">
+<div style="display:flex; align-items:center; gap:8px;">
+<span style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--text-muted);">Efectivo Recibido:</span>
+<div class="preset-pills">
+<button class="preset-pill" type="button">$20,000</button>
+<button class="preset-pill" type="button">$50,000</button>
+<button class="preset-pill" type="button">$100,000</button>
+</div>
+</div>
+<div style="display:flex; align-items:center; gap:8px;">
+<span style="font-size:11px; font-weight:600; text-transform:uppercase; color:var(--text-muted);">Valor Recibido:</span>
+<input class="input-cash-received" type="text" value="$20,000"/>
+</div>
+</div>
+<div class="change-banner">
+<span class="font-heading" style="color:var(--secondary); font-size:14px; font-weight:700; display:flex; align-items:center; gap:6px;">
+<span class="material-symbols-outlined" style="font-size:18px;">currency_exchange</span>
+<span>CAMBIO A ENTREGAR AL CLIENTE:</span>
+</span>
+<span class="font-heading" style="color:var(--secondary); font-size:22px; font-weight:700;">$1,800 COP</span>
+</div>
+</div>
+<!-- FACTURACIÓN ELECTRÓNICA DIAN -->
+<label class="dian-row">
+<input type="checkbox"/>
+<div>
+<div style="font-weight:600; font-size:13px; color:#fff;">Generar Factura Electrónica DIAN con NIT / Razón Social</div>
+<div style="font-size:11px; color:var(--text-muted);">Requiere solicitar RUT o cédula del conductor para envío XML/PDF automático</div>
+</div>
+</label>
+<!-- BOTÓN PRINCIPAL DE COBRO -->
+<button class="btn-charge-master" onclick="alert('Pago procesado con éxito: $18,200 COP. Talanquera Salida 1 Liberada.')" type="button">
+<div class="btn-charge-inner-left">
+<span class="material-symbols-outlined" style="font-size:32px;">check_circle</span>
+<div>
+<div class="charge-title">Procesar Cobro $18,200</div>
+<div class="charge-sub">IMPRIMIR FACTURA POS + ABRIR CAJÓN</div>
+</div>
+</div>
+<div class="barrier-pill">
+<span class="material-symbols-outlined" style="font-size:20px;">garage</span>
+<span>Liberar Talanquera [F4]</span>
+</div>
+</button>
+</div>
+</div>
+<!-- RIGHT COLUMN: CASH ARQUEO & TX AUDIT -->
+<div class="col-right">
+<!-- ARQUEO Y DESGLOSE FÍSICO DE GAVETA -->
+<div class="card">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span class="font-heading" style="font-size:14px; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+<span class="material-symbols-outlined" style="color:var(--secondary); font-size:18px;">inventory_2</span>
+                Arqueo y Desglose de Caja Físico
+              </span>
+<span class="font-mono" style="background:var(--primary-dim); color:var(--primary-light); padding:2px 8px; border-radius:3px; font-size:10px; font-weight:700;">
+                CUADRADO ($0 DISCREPANCIA)
+              </span>
+</div>
+<div class="arqueo-grid">
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Billete $50,000</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">8 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$400,000</span>
+</div>
+</div>
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Billete $20,000</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">12 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$240,000</span>
+</div>
+</div>
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Billete $10,000</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">11 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$110,000</span>
+</div>
+</div>
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Billete $5,000</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">7 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$35,000</span>
+</div>
+</div>
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Billete $2,000</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">12 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$24,000</span>
+</div>
+</div>
+<div class="arqueo-cell">
+<span class="arqueo-cell-header">Monedas Varias</span>
+<div class="arqueo-cell-row">
+<span style="font-weight:600;">11 und</span>
+<span class="font-mono" style="color:var(--primary-light); font-weight:700; font-size:11.5px;">$11,000</span>
+</div>
+</div>
+</div>
+<div class="arqueo-total-bar">
+<span style="font-size:12.5px; font-weight:600;">Total Efectivo Contado en Gaveta:</span>
+<span class="font-heading" style="color:var(--secondary); font-size:18px; font-weight:700;">$820,000 COP</span>
+</div>
+</div>
+<!-- TABLA DE AUDITORÍA DE ÚLTIMAS TRANSACCIONES -->
+<div class="card" style="flex:1;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<span class="font-heading" style="font-size:14px; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+<span class="material-symbols-outlined" style="color:var(--tertiary); font-size:18px;">history</span>
+                Últimas Transacciones Registradas
+              </span>
+<button class="font-mono" style="background:none; border:none; color:var(--primary-light); font-size:11px; cursor:pointer; display:flex; align-items:center; gap:3px;" type="button">
+<span class="material-symbols-outlined" style="font-size:14px;">refresh</span>
+                Refrescar
+              </button>
+</div>
+<div class="filter-pills">
+<button class="filter-btn active" type="button">Todos</button>
+<button class="filter-btn" type="button">Efectivo</button>
+<button class="filter-btn" type="button">Datáfono</button>
+<button class="filter-btn" type="button">Digital</button>
+<button class="filter-btn" type="button">Convenios</button>
+</div>
+<div class="tx-list">
+<!-- Tx 1 -->
+<div class="tx-item">
+<div class="tx-top-row">
+<div class="tx-car-col">
+<div class="plate-co-sm">
+<span class="plate-num">QHY·582</span>
+<span class="plate-city">BOGOTÁ</span>
+</div>
+<div>
+<div class="font-heading" style="font-size:13px; font-weight:700;">TK-89300</div>
+<div style="font-size:11px; color:var(--text-muted);">Fracción regular • 1h 45m</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-heading" style="color:var(--primary-light); font-size:15px; font-weight:700;">$11,550</div>
+<div class="font-mono" style="font-size:10px; color:var(--secondary);">Efectivo</div>
+</div>
+</div>
+<div class="tx-foot-row">
+<span>11:38:12 AM • Garita 02</span>
+<div style="display:flex; align-items:center; gap:6px;">
+<span style="color:var(--primary-light); font-weight:700;">Aprobado DIAN</span>
+<span class="material-symbols-outlined" style="font-size:14px; cursor:pointer;" title="Reimprimir">print</span>
+</div>
+</div>
+</div>
+<!-- Tx 2 -->
+<div class="tx-item">
+<div class="tx-top-row">
+<div class="tx-car-col">
+<div class="plate-co-sm">
+<span class="plate-num">WNZ·419</span>
+<span class="plate-city">ENVIGADO</span>
+</div>
+<div>
+<div class="font-heading" style="font-size:13px; font-weight:700;">TK-89299</div>
+<div style="font-size:11px; color:var(--text-muted);">Lavado Express + Tarifa</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-heading" style="color:var(--tertiary); font-size:15px; font-weight:700;">$38,000</div>
+<div class="font-mono" style="font-size:10px; color:var(--tertiary);">Datáfono Visa</div>
+</div>
+</div>
+<div class="tx-foot-row">
+<span>11:34:05 AM • Garita 01</span>
+<div style="display:flex; align-items:center; gap:6px;">
+<span style="color:var(--primary-light); font-weight:700;">Aprobado DIAN</span>
+<span class="material-symbols-outlined" style="font-size:14px; cursor:pointer;" title="Reimprimir">print</span>
+</div>
+</div>
+</div>
+<!-- Tx 3 -->
+<div class="tx-item">
+<div class="tx-top-row">
+<div class="tx-car-col">
+<div class="plate-co-sm">
+<span class="plate-num">TLX·901</span>
+<span class="plate-city">CALI</span>
+</div>
+<div>
+<div class="font-heading" style="font-size:13px; font-weight:700;">TK-89298</div>
+<div style="font-size:11px; color:var(--text-muted);">Convenio Gimnasio Bodytech</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-heading" style="color:var(--secondary); font-size:15px; font-weight:700;">$6,500</div>
+<div class="font-mono" style="font-size:10px; color:var(--secondary);">QR Nequi</div>
+</div>
+</div>
+<div class="tx-foot-row">
+<span>11:29:44 AM • Garita 01</span>
+<div style="display:flex; align-items:center; gap:6px;">
+<span style="color:var(--primary-light); font-weight:700;">Aprobado DIAN</span>
+<span class="material-symbols-outlined" style="font-size:14px; cursor:pointer;" title="Reimprimir">print</span>
+</div>
+</div>
+</div>
+<!-- Tx 4 -->
+<div class="tx-item">
+<div class="tx-top-row">
+<div class="tx-car-col">
+<div class="plate-co-sm">
+<span class="plate-num">MHL·015</span>
+<span class="plate-city">CHÍA</span>
+</div>
+<div>
+<div class="font-heading" style="font-size:13px; font-weight:700;">TK-89297</div>
+<div style="font-size:11px; color:var(--error);">Pérdida de Ticket Físico</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-heading" style="color:#fff; font-size:15px; font-weight:700;">$25,000</div>
+<div class="font-mono" style="font-size:10px; color:var(--secondary);">Efectivo</div>
+</div>
+</div>
+<div class="tx-foot-row">
+<span>11:21:18 AM • Garita 02</span>
+<div style="display:flex; align-items:center; gap:6px;">
+<span style="color:var(--primary-light); font-weight:700;">Aprobado DIAN</span>
+<span class="material-symbols-outlined" style="font-size:14px; cursor:pointer;" title="Reimprimir">print</span>
+</div>
+</div>
+</div>
+<!-- Tx 5 -->
+<div class="tx-item">
+<div class="tx-top-row">
+<div class="tx-car-col">
+<div class="plate-co-sm">
+<span class="plate-num">ERD·874</span>
+<span class="plate-city">BOGOTÁ</span>
+</div>
+<div>
+<div class="font-heading" style="font-size:13px; font-weight:700;">TK-89296</div>
+<div style="font-size:11px; color:var(--text-muted);">Fracción • 42 min</div>
+</div>
+</div>
+<div style="text-align:right;">
+<div class="font-heading" style="color:var(--tertiary); font-size:15px; font-weight:700;">$4,620</div>
+<div class="font-mono" style="font-size:10px; color:var(--tertiary);">Datáfono Master</div>
+</div>
+</div>
+<div class="tx-foot-row">
+<span>11:15:02 AM • Garita 01</span>
+<div style="display:flex; align-items:center; gap:6px;">
+<span style="color:var(--primary-light); font-weight:700;">Aprobado DIAN</span>
+<span class="material-symbols-outlined" style="font-size:14px; cursor:pointer;" title="Reimprimir">print</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer de Auditoría -->
+<div class="audit-footer-bar">
+<span>Servidor DIAN: <strong style="color:var(--primary-light);">Conectado (CUFE OK)</strong></span>
+<span>Impresora Térmica: <strong style="color:var(--primary-light);">En Línea (Papel 82%)</strong></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F8') {
+        e.preventDefault();
+        alert('Abriendo cajón de dinero (Pulso RJ11 enviado)...');
+      }
+      if (e.key === 'F4') {
+        e.preventDefault();
+        alert('Pago procesado con éxito: $18,200 COP. Talanquera Salida 1 Liberada.');
+      }
+    });
+  </script>
+</body></html>

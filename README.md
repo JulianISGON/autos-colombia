@@ -2,7 +2,7 @@
 
 Backend y panel operativo inicial para la gestión de entradas y salidas del parqueadero Autos Colombia.
 
-Esta entrega corresponde a la primera parte del proyecto. El alcance está centrado en registrar el ingreso de vehículos autorizados, controlar las celdas disponibles, registrar novedades opcionales, gestionar la salida y consultar los vehículos presentes.
+Esta entrega contiene la primera y segunda iteración del proyecto. La primera iteración registra el ingreso y salida de vehículos. La segunda agrega la gestión de usuarios, mensualidades y estados de celdas, además de las vistas operativas correspondientes.
 
 ## Tecnologías
 
@@ -26,6 +26,11 @@ SQLite se ejecuta como un archivo local, por lo que el proyecto puede iniciarse 
 - Consulta de vehículos presentes y sus novedades.
 - Panel web conectado a la API para registrar entradas, buscar salidas y consultar movimientos.
 - Mapa operativo de celdas con filtros, búsqueda e inspector de estado.
+- Registro y listado de usuarios.
+- Actualización del estado de mensualidad entre `ACTIVA` y `VENCIDA`.
+- Registro y listado de nuevas celdas.
+- Cambio controlado de estados de celda entre `DISPONIBLE`, `OCUPADA` y `MANTENIMIENTO`.
+- Vistas web de usuarios, mensualidades, novedades y caja preparadas dentro del panel operativo.
 
 ## Arquitectura
 
@@ -118,6 +123,69 @@ Devuelve los vehículos con estado activo, celda, hora de ingreso y novedades as
 
 Devuelve todas las celdas con su estado actual, placa ocupante y hora de ingreso cuando corresponda.
 
+### Crear usuario
+
+`POST /api/v1/usuarios`
+
+```json
+{
+  "identificacion": "1003",
+  "nombre": "Laura Restrepo",
+  "telefono": "3004567890",
+  "estado_mensualidad": "ACTIVA"
+}
+```
+
+Retorna `201 Created` y rechaza identificaciones duplicadas con `400 Bad Request`.
+
+### Listar usuarios
+
+`GET /api/v1/usuarios`
+
+Devuelve todos los usuarios ordenados por nombre.
+
+### Actualizar mensualidad
+
+`PUT /api/v1/usuarios/:id/mensualidad`
+
+```json
+{
+  "estado_mensualidad": "ACTIVA"
+}
+```
+
+Acepta los estados `ACTIVA` y `VENCIDA`.
+
+### Crear celda
+
+`POST /api/v1/celdas`
+
+```json
+{
+  "numero_celda": "C-01"
+}
+```
+
+La celda se crea inicialmente como `DISPONIBLE`.
+
+### Listar celdas
+
+`GET /api/v1/celdas`
+
+Devuelve el estado, la placa ocupante y la hora de ingreso cuando existe un acceso activo.
+
+### Actualizar estado de celda
+
+`PUT /api/v1/celdas/:id/estado`
+
+```json
+{
+  "estado": "MANTENIMIENTO"
+}
+```
+
+Una celda en mantenimiento no se asigna automáticamente. Una celda ocupada debe liberarse mediante el flujo normal de salida para conservar la consistencia con `registro_acceso`.
+
 ## Datos iniciales
 
 El servidor carga automáticamente estos datos cuando la base está vacía:
@@ -136,4 +204,8 @@ La entrega fue compilada correctamente con:
 npm run build
 ```
 
-También se verificaron los flujos de entrada con novedad, prevención de entrada duplicada, rechazo de mensualidad vencida, consulta de presentes y salida con liberación de celda.
+También se verificaron los flujos de entrada con novedad, prevención de entrada duplicada, rechazo de mensualidad vencida, consulta de presentes, salida con liberación de celda, creación de usuarios, actualización de mensualidad, creación de celdas y cambio a mantenimiento.
+
+## Alcance pendiente
+
+Las plantillas de Caja y Pagos y Novedades y Daños están integradas como vistas preparadas. Sus operaciones completas requieren futuras tablas y endpoints para pagos, tarifas, turnos, evidencias, bitácoras y facturación.
