@@ -1,4 +1,4 @@
-const state = { celdas: [], presentes: [], usuarios: [], selectedCell: null, exitRegistro: null, editingUserId: null, filter: 'all' };
+const state = { celdas: [], presentes: [], usuarios: [], pagos: [], resumenCuentas: [], selectedCell: null, exitRegistro: null, editingUserId: null, filter: 'all' };
 
 const $ = (selector) => document.querySelector(selector);
 const api = async (path, options) => {
@@ -59,6 +59,7 @@ function selectCell(numeroCelda) {
 async function refresh() {
   [state.celdas, state.presentes, state.usuarios] = await Promise.all([api('/celdas'), api('/presentes'), api('/api/v1/usuarios')]);
   renderMetrics(); renderMovements(); renderMap(); renderUsers(); renderNovelties();
+  await refreshPayments();
 }
 
 function renderUsers() {
@@ -127,6 +128,7 @@ function switchView(view) {
   document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.view === view));
   if (view === 'mapa') renderMap();
   if (view === 'usuarios') renderUsers();
+  if (view === 'caja') refreshPayments().catch((error) => showMessage('#paymentMessage', error.message, true));
 }
 
 async function registerEntry() {
@@ -144,10 +146,68 @@ async function registerExit() {
   try { const result = await api('/salida', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ placa: state.exitRegistro.placa }) }); showMessage('#exitMessage', `Salida registrada. Celda ${result.celda} liberada.`); state.exitRegistro = null; $('#exitButton').disabled = true; $('#exitSummary').className = 'exit-summary empty-state'; $('#exitSummary').innerHTML = '<span class="material-symbols-outlined">check_circle</span><p>Salida completada correctamente.</p>'; await refresh(); } catch (error) { showMessage('#exitMessage', error.message, true); }
 }
 
+function formatCurrency(value) {
+  return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(value));
+}
+
+function renderPayments() {
+  const total = state.pagos.reduce((sum, payment) => sum + Number(payment.monto), 0);
+  $('#paymentTotal').textContent = formatCurrency(total);
+  $('#paymentCount').textContent = String(state.pagos.length);
+  $('#paymentRows').innerHTML = state.pagos.length ? state.pagos.map((payment) => `<tr><td><code>${payment.codigo_comprobante}</code></td><td>${new Date(payment.fecha_pago).toLocaleString('es-CO')}</td><td>${payment.nombre}</td><td><code>${payment.identificacion}</code></td><td><b>${formatCurrency(payment.monto)}</b></td><td>${payment.metodo_pago}</td><td><span class="status-pill status-active">${payment.estado_pago}</span></td></tr>`).join('') : '<tr><td colspan="7" class="empty-state">No hay pagos registrados.</td></tr>';
+
+  const alDia = state.resumenCuentas.filter((account) => account.estado_cuenta === 'AL DIA').length;
+  const enMora = state.resumenCuentas.length - alDia;
+  $('#accountStatus').textContent = `${alDia} AL DÍA`;
+  $('#accountStatusDetail').textContent = `${enMora} usuarios en mora.`;
+  $('#accountRows').innerHTML = state.resumenCuentas.length ? state.resumenCuentas.map((account) => {
+    const accountStatus = account.estado_cuenta === 'AL DIA'
+      ? '<span class="status-pill status-active">AL DÍA</span>'
+      : '<span class="status-pill status-expired">EN MORA</span>';
+    const ultimoPago = account.ultimo_pago
+      ? `<code>${account.ultimo_pago.codigo_comprobante}</code><small>${formatCurrency(account.ultimo_pago.monto)} · ${new Date(account.ultimo_pago.fecha_pago).toLocaleDateString('es-CO')}</small>`
+      : '<span class="muted-text">Sin pagos</span>';
+    return `<tr><td><code>${account.identificacion}</code></td><td>${account.nombre}</td><td><span class="status-pill ${account.estado_mensualidad === 'ACTIVA' ? 'status-active' : 'status-expired'}">${account.estado_mensualidad}</span></td><td>${accountStatus}</td><td>${ultimoPago}</td></tr>`;
+  }).join('') : '<tr><td colspan="5" class="empty-state">No hay usuarios registrados.</td></tr>';
+}
+
+async function refreshPayments() {
+  const identificacion = ($('#paymentSearch')?.value || '').trim();
+  const query = identificacion ? `?identificacion=${encodeURIComponent(identificacion)}` : '';
+  [state.pagos, state.resumenCuentas] = await Promise.all([
+    api(`/api/v1/pagos${query}`),
+    api('/api/v1/pagos/resumen')
+  ]);
+  renderPayments();
+}
+
+async function registerPayment(event) {
+  event.preventDefault();
+  const body = {
+    identificacion: $('#paymentIdentification').value.trim(),
+    monto: Number($('#paymentAmount').value),
+    metodo_pago: $('#paymentMethod').value
+  };
+  try {
+    const payment = await api('/api/v1/pagos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    showMessage('#paymentMessage', `Pago registrado. Mensualidad de ${payment.nombre} activada.`);
+    $('#paymentReceipt').innerHTML = `<strong>${payment.codigo_comprobante}</strong><span>${new Date(payment.fecha_pago).toLocaleString('es-CO')}</span><b>${payment.nombre}</b><small>Identificación ${payment.identificacion}</small><b>${formatCurrency(payment.monto)} · ${payment.metodo_pago}</b>`;
+    event.target.reset();
+    await refresh();
+  } catch (error) {
+    $('#paymentReceipt').innerHTML = '';
+    showMessage('#paymentMessage', error.message, true);
+  }
+}
+
 function bindEvents() {
   $('#entryPlate').addEventListener('input', (event) => { event.target.value = event.target.value.toUpperCase(); $('#entryPreview').textContent = event.target.value || '---'; });
   $('#hasNovelty').addEventListener('change', (event) => { $('#noveltyText').hidden = !event.target.checked; });
-  $('#entryButton').addEventListener('click', registerEntry); $('#searchExit').addEventListener('click', searchExit); $('#exitButton').addEventListener('click', registerExit); $('#refreshButton').addEventListener('click', refresh); $('#mapRefresh').addEventListener('click', refresh); $('#cellSearch').addEventListener('input', renderMap); $('#cellForm').addEventListener('submit', createCell); $('#userSearch').addEventListener('input', renderUsers); $('#refreshUsers').addEventListener('click', refresh); $('#userForm').addEventListener('submit', createUser); $('#cancelUserEdit').addEventListener('click', resetUserForm);
+  $('#entryButton').addEventListener('click', registerEntry); $('#searchExit').addEventListener('click', searchExit); $('#exitButton').addEventListener('click', registerExit); $('#refreshButton').addEventListener('click', refresh); $('#mapRefresh').addEventListener('click', refresh); $('#cellSearch').addEventListener('input', renderMap); $('#cellForm').addEventListener('submit', createCell); $('#userSearch').addEventListener('input', renderUsers); $('#refreshUsers').addEventListener('click', refresh); $('#userForm').addEventListener('submit', createUser); $('#cancelUserEdit').addEventListener('click', resetUserForm); $('#paymentForm').addEventListener('submit', registerPayment); $('#paymentSearch').addEventListener('input', () => refreshPayments().catch((error) => showMessage('#paymentMessage', error.message, true))); $('#refreshPayments').addEventListener('click', () => refreshPayments().catch((error) => showMessage('#paymentMessage', error.message, true)));
   document.querySelectorAll('.filter').forEach((button) => button.addEventListener('click', () => { document.querySelectorAll('.filter').forEach((item) => item.classList.remove('active')); button.classList.add('active'); state.filter = button.dataset.filter === 'all' ? 'all' : button.dataset.filter; renderMap(); }));
   document.querySelectorAll('.nav-item, [data-view="control"]').forEach((button) => button.addEventListener('click', () => switchView(button.dataset.view)));
   document.addEventListener('keydown', (event) => { if (event.key === 'F2') { event.preventDefault(); $('#entryPlate').focus(); } if (event.key === 'F4') { event.preventDefault(); $('#exitPlate').focus(); } });

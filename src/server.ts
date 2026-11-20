@@ -2,6 +2,7 @@ import express from 'express';
 import accesoRoutes from './routes/accesoRoutes';
 import usuarioRoutes from './routes/usuarioRoutes';
 import celdaRoutes from './routes/celdaRoutes';
+import pagoRoutes from './routes/pagoRoutes';
 import { initializeDatabase } from './config/database';
 import path from 'node:path';
 
@@ -13,6 +14,7 @@ app.use(express.static(path.resolve(process.cwd(), 'public')));
 app.use('/api/v1/acceso', accesoRoutes);
 app.use('/api/v1/usuarios', usuarioRoutes);
 app.use('/api/v1/celdas', celdaRoutes);
+app.use('/api/v1/pagos', pagoRoutes);
 
 initializeDatabase()
   .then(() => {

@@ -68,6 +68,16 @@ export function initializeDatabase(): Promise<void> {
           fecha_registro TEXT NOT NULL,
           FOREIGN KEY (id_registro) REFERENCES registro_acceso(id_registro)
         )`);
+        await run(`CREATE TABLE IF NOT EXISTS pago (
+          id_pago INTEGER PRIMARY KEY AUTOINCREMENT,
+          codigo_comprobante TEXT UNIQUE NOT NULL,
+          id_usuario INTEGER NOT NULL,
+          monto NUMERIC NOT NULL CHECK (monto > 0),
+          metodo_pago TEXT NOT NULL,
+          estado_pago TEXT NOT NULL,
+          fecha_pago TEXT NOT NULL,
+          FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+        )`);
 
         const userCount = await get<{ count: number }>('SELECT COUNT(*) AS count FROM usuario');
         const cellCount = await get<{ count: number }>('SELECT COUNT(*) AS count FROM celda');

@@ -2,7 +2,7 @@
 
 Backend y panel operativo inicial para la gestión de entradas y salidas del parqueadero Autos Colombia.
 
-Esta entrega contiene la primera y segunda iteración del proyecto. La primera iteración registra el ingreso y salida de vehículos. La segunda agrega la gestión de usuarios, mensualidades y estados de celdas, además de las vistas operativas correspondientes.
+Esta entrega contiene las tres iteraciones del proyecto. La primera registra el ingreso y salida de vehículos. La segunda agrega la gestión de usuarios, mensualidades y estados de celdas. La tercera agrega el registro de pagos, comprobantes, historial y estado consolidado de cuentas.
 
 ## Tecnologías
 
@@ -30,7 +30,11 @@ SQLite se ejecuta como un archivo local, por lo que el proyecto puede iniciarse 
 - Actualización del estado de mensualidad entre `ACTIVA` y `VENCIDA`.
 - Registro y listado de nuevas celdas.
 - Cambio controlado de estados de celda entre `DISPONIBLE`, `OCUPADA` y `MANTENIMIENTO`.
-- Vistas web de usuarios, mensualidades, novedades y caja preparadas dentro del panel operativo.
+- Vistas web funcionales de usuarios, mensualidades, novedades y caja dentro del panel operativo.
+- Registro transaccional de pagos y activación automática de mensualidades.
+- Comprobante único por pago con formato `REC-NNNN`.
+- Consulta de historial completo o filtrado por identificación.
+- Resumen visual de cuentas `AL DÍA` y `EN MORA`.
 
 ## Arquitectura
 
@@ -185,6 +189,45 @@ Devuelve el estado, la placa ocupante y la hora de ingreso cuando existe un acce
 ```
 
 Una celda en mantenimiento no se asigna automáticamente. Una celda ocupada debe liberarse mediante el flujo normal de salida para conservar la consistencia con `registro_acceso`.
+
+### Registrar pago
+
+`POST /api/v1/pagos`
+
+```json
+{
+  "identificacion": "1002",
+  "monto": 120000,
+  "metodo_pago": "TRANSFERENCIA"
+}
+```
+
+Retorna `201 Created` con el comprobante generado y activa automáticamente la mensualidad del usuario.
+
+Métodos admitidos:
+
+- `EFECTIVO`
+- `TRANSFERENCIA`
+- `TARJETA_DEBITO`
+- `TARJETA_CREDITO`
+
+Un monto menor o igual a cero responde `400`. Una identificación inexistente responde `404`. El pago y la activación se realizan dentro de una transacción.
+
+### Consultar historial de pagos
+
+`GET /api/v1/pagos`
+
+Devuelve todos los pagos desde el más reciente al más antiguo.
+
+`GET /api/v1/pagos?identificacion=1002`
+
+Devuelve únicamente los pagos asociados a esa identificación.
+
+### Consultar estado consolidado de cuentas
+
+`GET /api/v1/pagos/resumen`
+
+Devuelve cada usuario con su mensualidad, estado de cuenta (`AL DIA` o `EN MORA`) y último pago registrado.
 
 ## Datos iniciales
 

@@ -80,3 +80,36 @@ export interface SalidaResult {
 export interface UsuarioConVehiculos extends Usuario {
   vehiculos: Vehiculo[];
 }
+
+export type MetodoPago = 'EFECTIVO' | 'TRANSFERENCIA' | 'TARJETA_DEBITO' | 'TARJETA_CREDITO';
+export type EstadoPago = 'PAGADO';
+
+export interface Pago {
+  id_pago: number;
+  codigo_comprobante: string;
+  id_usuario: number;
+  monto: number;
+  metodo_pago: MetodoPago;
+  estado_pago: EstadoPago;
+  fecha_pago: string;
+}
+
+export interface PagoConUsuario extends Pago {
+  identificacion: string;
+  nombre: string;
+}
+
+export interface PagoRegistroRequest {
+  identificacion: string;
+  monto: number;
+  metodo_pago: MetodoPago;
+}
+
+export interface ResumenCuentaUsuario {
+  id_usuario: number;
+  identificacion: string;
+  nombre: string;
+  estado_mensualidad: EstadoMensualidad;
+  estado_cuenta: 'AL DIA' | 'EN MORA';
+  ultimo_pago: PagoConUsuario | null;
+}
